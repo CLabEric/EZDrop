@@ -1,0 +1,6 @@
+.*
+!/.gitignore
+build/
+contracts/
+node_modules/
+package-lock.json
