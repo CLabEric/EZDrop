@@ -15,7 +15,6 @@ const MongoStore = require('connect-mongo')(session);
  * -------------- GENERAL SETUP ----------------
  */
 
-// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
 require('dotenv').config();
 
 // Create the Express application
@@ -24,7 +23,7 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
-    origin: 'http://localhost:8081',
+    origin: 'https://easydrop.herokuapp.com',
     credentials: true
 }));
 app.use(fileUpload());
@@ -78,4 +77,4 @@ app.use(routes);
  */
 
 // Server listens on http://localhost:3000
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
