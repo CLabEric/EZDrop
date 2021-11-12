@@ -87,9 +87,10 @@ const ipfs = create('http://localhost:5001');
  */
 
 router.get('/', async (req, res, next) => {
-    NFTMeta.find().then( results => {
-        res.send( results )
-    }).catch();
+    // NFTMeta.find().then( results => {
+    //     res.send( results )
+    // }).catch();
+    res.send('hello world')
 });
 
 router.get('/login', isAuth, (req, res, next) => {
