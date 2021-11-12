@@ -39,29 +39,29 @@ export default {
     },
     methods: {
         handleForm(event) {
-            // this.passwordError = this.password.length > 5 ? '' : 'Password must be at least 6 characters long';
-            // fetch('http://localhost:3000/register', {
-            //     method: 'POST',
-            //     headers: {
-            //         "Content-Type": "application/json"
-            //     },
-            //     body: JSON.stringify({
-            //         uname: event.target[0].value,
-            //         email: event.target[1].value,
-            //         pw: event.target[2].value
-            //     })
-            // })
-            // .then(async (response) => {
-            //     const text = await response.text();
-            //     if (!response.ok) {
-            //         throw text;
-            //     } else {
-            //         this.$router.push('login');
-            //     }
-            // })
-            // .catch((error) => {
-            //     console.error("throw error", error);
-            // });
+            this.passwordError = this.password.length > 5 ? '' : 'Password must be at least 6 characters long';
+            fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    uname: event.target[0].value,
+                    email: event.target[1].value,
+                    pw: event.target[2].value
+                })
+            })
+            .then(async (response) => {
+                const text = await response.text();
+                if (!response.ok) {
+                    throw text;
+                } else {
+                    this.$router.push('login');
+                }
+            })
+            .catch((error) => {
+                console.error("throw error", error);
+            });
         },
         checkAuth() {
             axios({
