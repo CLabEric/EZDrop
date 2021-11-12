@@ -1,9 +1,10 @@
 {
-  "name": "express-session-authenticator-starter",
+  "name": "ez-drop-backend",
   "version": "1.0.0",
-  "description": "A tutorial on session based user authentication using Passport JS",
+  "description": "A simplified platform to host your  NFT Drops",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
