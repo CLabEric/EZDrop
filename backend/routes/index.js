@@ -7,7 +7,7 @@ const NFTMeta = connection.models.NFTMeta;
 const isAuth = require('./authMiddleware').isAuth;
 const isAdmin = require('./authMiddleware').isAdmin;
 const { create } = require('ipfs-http-client');
-const ipfs = create('http://localhost:5001');
+const ipfs = create('https://ipfs.infura.io:5001');
 
 /**
  * -------------- POST ROUTES ----------------
