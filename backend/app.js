@@ -7,8 +7,6 @@ var routes = require('./routes');
 const connection = require('./config/database');
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
-
-// Package documentation - https://www.npmjs.com/package/connect-mongo
 const MongoStore = require('connect-mongo')(session);
 
 /**
@@ -17,14 +15,12 @@ const MongoStore = require('connect-mongo')(session);
 
 require('dotenv').config();
 
-// Create the Express application
 var app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
-    // origin: 'http://localhost:8081',
-    origin: 'https://easydrop.herokuapp.com',
+    origin: process.env.ORIGIN || "http://localhost:8081",
     credentials: true
 }));
 app.use(fileUpload());

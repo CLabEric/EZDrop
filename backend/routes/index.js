@@ -6,8 +6,6 @@ const User = connection.models.User;
 const NFTMeta = connection.models.NFTMeta;
 const isAuth = require('./authMiddleware').isAuth;
 const isAdmin = require('./authMiddleware').isAdmin;
-// const { create } = require('ipfs-http-client');
-// const ipfs = create('https://ipfs.infura.io:5001');
 
 /**
  * -------------- POST ROUTES ----------------
@@ -44,22 +42,16 @@ const isAdmin = require('./authMiddleware').isAdmin;
  });
 
  router.post('/upload', async (req, res, next) => {
-    // const fileHash = await ipfs.add(req.files.file.data);
-    // const tokenMeta = {
-    //     "name": req.body.name,
-    //     "description": req.body.description,
-    //     "image": "https://ipfs.io/ipfs/" + fileHash.path
-    // };
-    // const tokenURI = await ipfs.add(JSON.stringify(tokenMeta));
+     console.log(typeof req.files.file.data)
     const itemData = {
-        'name'   : req.body.name,
-        'price'  : req.body.price,
-        'image'  : req.files.file.data,
-        'txhash' : ''
+        'name'        : req.body.name,
+        'price'       : req.body.price,
+        'description' : req.body.description,
+        'image'       : req.files.file.data,
+        'txhash'      : ''
     };
     const newNFTMeta = new NFTMeta({
-        itemData: itemData,
-        tokenUri: tokenURI
+        itemData: itemData
     });
 
     newNFTMeta.save()
@@ -101,12 +93,6 @@ router.get('/register', isAuth, (req, res, next) => {
     res.send('already logged in');
 });
 
-/**
- * Lookup how to authenticate users on routes with Local Strategy
- * Google Search: "How to use Express Passport Local Strategy"
- * 
- * Also, look up what behaviour express session has without a maxage set
- */
 router.get('/dashboard', isAuth, async (req, res, next) => {
     NFTMeta.find().then( results => {
         res.send( results )

@@ -1,6 +1,5 @@
 <template>
   <div id="home">
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div class="home">
       <h1>home page</h1>
     </div>
@@ -21,8 +20,10 @@
               :class="{ sold: nft.itemData.txhash }"
               @click="mintNft($event, index)" 
               :data-name="nft.itemData.name"
-              :data-uri="nft.tokenUri.path"
+              :data-description="nft.itemData.description"
               :data-price="nft.itemData.price"
+              :data-image="nft.itemData.image"
+              :data-hash="nft.itemData.txhash"
             >Mint
             </button>
             <a href="#" :class="{ sold: !nft.itemData.txhash, hash: true }">{{ nft.itemData.txhash }}</a>
@@ -38,7 +39,9 @@
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
 import axios from "axios";
+import fs from "fs";
 import Web3 from "web3";
+import { create } from "ipfs-http-client";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
 // import ezDropArtifact from "../../contracts/ezDrop.json";
 
@@ -95,10 +98,18 @@ export default {
       this.account = accounts[0];
     },
     async mintNft(e, index) {
-      const uri = e.target.dataset.uri;
       const { mint } = this.contract.methods;
+      const ipfs = create('https://ipfs.infura.io:5001');
       const weiValue = Web3.utils.toWei(e.target.dataset.price, 'ether');
-      await mint(uri)
+      const image = new Buffer.from(e.target.dataset.image, 'base64');
+      const fileHash = await ipfs.add(image);
+      const tokenMeta = {
+          "name": e.target.dataset.name,
+          "description": e.target.dataset.description,
+          "image": "https://ipfs.io/ipfs/" + fileHash.path
+      };
+      const tokenURI = await ipfs.add(JSON.stringify(tokenMeta));
+      await mint(tokenURI)
         .send({ from: this.account, value: parseInt(weiValue) })
         .on("receipt", (receipt) => {
           this.metaData[index].itemData.txhash = receipt.transactionHash;
@@ -121,15 +132,15 @@ export default {
         console.error('FAILURE!!', error);
       });
     },
-    // async burn(e) {
-    //   const { _burn } = this.contract.methods;
-    //   const number = parseInt(e.target.number.value);
-    //   await _burn(number)
-    //     .send({ from: this.account })
-    //     .on('receipt', () => {
-    //       console.log('burned?');
-    //     });
-    // }
+    async burn(e) {
+      // const { _burn } = this.contract.methods;
+      // const number = parseInt(e.target.number.value);
+      // await _burn(number)
+      //   .send({ from: this.account })
+      //   .on('receipt', () => {
+      //     console.log('burned?');
+      //   });
+    }
   }
 }
 </script>
