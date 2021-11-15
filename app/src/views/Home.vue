@@ -39,7 +39,6 @@
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
 import axios from "axios";
-import fs from "fs";
 import Web3 from "web3";
 import { create } from "ipfs-http-client";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
