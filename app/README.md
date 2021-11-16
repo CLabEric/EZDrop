@@ -1,4 +1,4 @@
-# vapp
+# app
 
 ## Project setup
 ```
