@@ -19,7 +19,7 @@ export default {
     logout() {
       axios({
         method: 'get',
-        url: 'http://localhost:3000/logout',
+        url: `${process.env.BACKEND_URL}logout`,
         responseType: 'text',
         withCredentials: true
       })

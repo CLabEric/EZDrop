@@ -74,7 +74,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: 'http://localhost:3000/',
+        url: process.env.BACKEND_URL,
         responseType: 'text'
       })
       .then( response => {
@@ -119,7 +119,7 @@ export default {
         });
     },
     async setTxHash(id, txHash) {
-      axios.post( 'http://localhost:3000/setHash',
+      axios.post( `${process.env.BACKEND_URL}setHash`,
         {id, txHash}
       ).
       then( response => {

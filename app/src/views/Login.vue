@@ -44,7 +44,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: 'http://localhost:3000/login',
+                url: `${process.env.BACKEND_URL}login`,
                 responseType: 'text',
                 withCredentials: true,
                 headers: {"Content-Type": "application/json"},
@@ -74,7 +74,7 @@ export default {
         checkAuth() {
             axios({
                 method: 'get',
-                url: 'http://localhost:3000/login',
+                url: `${process.env.BACKEND_URL}login`,
                 responseType: 'text',
                 withCredentials: true
             })

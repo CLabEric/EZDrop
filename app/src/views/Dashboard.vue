@@ -100,7 +100,7 @@ export default {
       formData.append('name', this.name);
       formData.append('description', this.description);
       formData.append('price', this.price);
-      axios.post( 'http://localhost:3000/upload',
+      axios.post( `${process.env.BACKEND_URL}upload`,
         formData,
         {
           headers: {
@@ -119,7 +119,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: 'http://localhost:3000/dashboard',
+        url: `${process.env.BACKEND_URL}dashboard`,
         responseType: 'text',
         withCredentials: true
       })

@@ -40,7 +40,7 @@ export default {
     methods: {
         handleForm(event) {
             this.passwordError = this.password.length > 5 ? '' : 'Password must be at least 6 characters long';
-            fetch('http://localhost:3000/register', {
+            fetch(`${process.env.BACKEND_URL}register`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -66,7 +66,7 @@ export default {
         checkAuth() {
             axios({
                 method: 'get',
-                url: 'http://localhost:3000/register',
+                url: `${process.env.BACKEND_URL}register`,
                 responseType: 'text',
                 withCredentials: true
             })
