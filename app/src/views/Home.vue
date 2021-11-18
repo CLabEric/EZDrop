@@ -74,7 +74,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: process.env.BACKEND_URL,
+        url: process.env.VUE_APP_BACKEND_URL,
         responseType: 'text'
       })
       .then( response => {
