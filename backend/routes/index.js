@@ -88,7 +88,6 @@ router.get('/login', isAuth, (req, res, next) => {
     res.send('already logged in');
 });
 
-// When you visit http://localhost:3000/register, you will see "Register Page"
 router.get('/register', isAuth, (req, res, next) => {
     res.send('already logged in');
 });
