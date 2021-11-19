@@ -44,7 +44,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: `${process.env.BACKEND_URL}login`,
+                url: `${process.env.VUE_APP_BACKEND_URL}login`,
                 responseType: 'text',
                 withCredentials: true,
                 headers: {"Content-Type": "application/json"},
@@ -74,7 +74,7 @@ export default {
         checkAuth() {
             axios({
                 method: 'get',
-                url: `${process.env.BACKEND_URL}login`,
+                url: `${process.env.VUE_APP_BACKEND_URL}login`,
                 responseType: 'text',
                 withCredentials: true
             })

@@ -41,7 +41,7 @@
 import axios from "axios";
 import Web3 from "web3";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
-// import ezDropArtifact from "../../contracts/ezDrop.json";
+import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
 
 axios.defaults.withCredentials = true;
 
@@ -100,7 +100,7 @@ export default {
       formData.append('name', this.name);
       formData.append('description', this.description);
       formData.append('price', this.price);
-      axios.post( `${process.env.BACKEND_URL}upload`,
+      axios.post( `${process.env.VUE_APP_BACKEND_URL}upload`,
         formData,
         {
           headers: {
@@ -119,7 +119,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: `${process.env.BACKEND_URL}dashboard`,
+        url: `${process.env.VUE_APP_BACKEND_URL}dashboard`,
         responseType: 'text',
         withCredentials: true
       })
@@ -135,12 +135,19 @@ export default {
       const deployedNetwork = ezDropArtifact.networks[networkId];
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      this.contract = new web3.eth.Contract(
-        ezDropArtifact.abi,
-        // ezDropArtifact,
-        deployedNetwork.address
-        // '0x29B187A37781c0EB193EA25A9feF2ade80Fd7b72'
-      );
+      // if rinkeby
+      if (networkId == 4) {
+        this.contract = new web3.eth.Contract(
+          ezDropArtifactRinkeby,
+          '0x3240fAa0FD71868D18D1879EcdC5CE704949a741'
+        );
+      } else {
+        this.contract = new web3.eth.Contract(
+          ezDropArtifact.abi,
+          deployedNetwork.address
+        );
+      }
+
       // console.log(this.contract);
       this.account = accounts[0];
     },

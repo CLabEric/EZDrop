@@ -42,7 +42,7 @@ import axios from "axios";
 import Web3 from "web3";
 import { create } from "ipfs-http-client";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
-// import ezDropArtifact from "../../contracts/ezDrop.json";
+import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
 
 export default {
   name: 'Home',
@@ -82,17 +82,24 @@ export default {
       });
     },
     async web3stuff() {
+      
       const web3 = this.web3;
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = ezDropArtifact.networks[networkId];
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      // if rinkeby
+      if (networkId == 4) {
+        this.contract = new web3.eth.Contract(
+          ezDropArtifactRinkeby,
+          '0x3240fAa0FD71868D18D1879EcdC5CE704949a741'
+        );
+      } else {
+        this.contract = new web3.eth.Contract(
+          ezDropArtifact.abi,
+          deployedNetwork.address
+        );
+      }
 
-      this.contract = new web3.eth.Contract(
-        ezDropArtifact.abi,
-        // ezDropArtifact,
-        deployedNetwork.address
-        // '0x29B187A37781c0EB193EA25A9feF2ade80Fd7b72'
-      );
       // console.log(this.contract);
       this.account = accounts[0];
     },
