@@ -72,12 +72,9 @@ export default {
   },
   methods: {
     getMetadata() {
-const huh = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_PROD_BACKEND_URL : process.env.VUE_APP_BACKEND_URL;
-console.log(process.env.NODE_ENV);
-console.log(huh);
       axios({
         method: 'get',
-        url: process.env.NODE_ENV === 'production' ? process.env.VUE_APP_PROD_BACKEND_URL : process.env.VUE_APP_BACKEND_URL,
+        url: process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL,
         responseType: 'text'
       })
       .then( response => {
