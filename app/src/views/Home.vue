@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     getMetadata() {
-const huh = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_PROD_BACKEND_URL : process.env.VUE_APP_BACKEND_URL;
+const huh = process.env.NODE_ENV === 'production' ? secrets.VUE_APP_PROD_BACKEND_URL : process.env.VUE_APP_BACKEND_URL;
 console.log(process.env.NODE_ENV);
 console.log(huh);
       axios({
