@@ -140,7 +140,7 @@ export default {
       if (networkId == 4) {
         this.contract = new web3.eth.Contract(
           ezDropArtifactRinkeby,
-          '0x3240fAa0FD71868D18D1879EcdC5CE704949a741'
+          '0xAA8Ac4e956508708218B6c01f21781873421533c'
         );
       } else {
         this.contract = new web3.eth.Contract(
