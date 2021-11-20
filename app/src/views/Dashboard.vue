@@ -43,6 +43,7 @@ import Web3 from "web3";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
 import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
 
+const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 axios.defaults.withCredentials = true;
 
 export default {
@@ -100,7 +101,7 @@ export default {
       formData.append('name', this.name);
       formData.append('description', this.description);
       formData.append('price', this.price);
-      axios.post( `${process.env.VUE_APP_BACKEND_URL}upload`,
+      axios.post( `${backendUrl}upload`,
         formData,
         {
           headers: {
@@ -119,7 +120,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL,
+        url: backendUrl,
         responseType: 'text',
         withCredentials: true
       })

@@ -21,6 +21,8 @@
 <script>
 import axios from "axios";
 
+const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
+
 export default {
     data() {
         return {
@@ -44,7 +46,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: `${process.env.VUE_APP_BACKEND_URL}login`,
+                url: `${backendUrl}login`,
                 responseType: 'text',
                 withCredentials: true,
                 headers: {"Content-Type": "application/json"},
@@ -74,7 +76,7 @@ export default {
         checkAuth() {
             axios({
                 method: 'get',
-                url: `${process.env.VUE_APP_BACKEND_URL}login`,
+                url: `${backendUrl}login`,
                 responseType: 'text',
                 withCredentials: true
             })

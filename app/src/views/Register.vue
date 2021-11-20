@@ -20,6 +20,7 @@
 
 <script>
 import axios from "axios";
+const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 
 export default {
     data() {
@@ -40,7 +41,7 @@ export default {
     methods: {
         handleForm(event) {
             this.passwordError = this.password.length > 5 ? '' : 'Password must be at least 6 characters long';
-            fetch(`${process.env.VUE_APP_BACKEND_URL}register`, {
+            fetch(`${backendUrl}register`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
@@ -66,7 +67,7 @@ export default {
         checkAuth() {
             axios({
                 method: 'get',
-                url: `${process.env.VUE_APP_BACKEND_URL}register`,
+                url: `${backendUrl}register`,
                 responseType: 'text',
                 withCredentials: true
             })

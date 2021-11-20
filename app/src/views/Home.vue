@@ -44,6 +44,8 @@ import { create } from "ipfs-http-client";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
 import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
 
+const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
+
 export default {
   name: 'Home',
   data () {
@@ -74,7 +76,7 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL,
+        url: backendUrl,
         responseType: 'text'
       })
       .then( response => {
@@ -126,7 +128,7 @@ export default {
         });
     },
     async setTxHash(id, txHash) {
-      axios.post( `${process.env.VUE_APP_BACKEND_URL}setHash`,
+      axios.post( `${backendUrl}setHash`,
         {id, txHash}
       ).
       then( response => {
