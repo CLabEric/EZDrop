@@ -126,7 +126,7 @@ export default {
         });
     },
     async setTxHash(id, txHash) {
-      axios.post( `${process.env.BACKEND_URL}setHash`,
+      axios.post( `${process.env.VUE_APP_BACKEND_URL}setHash`,
         {id, txHash}
       ).
       then( response => {
