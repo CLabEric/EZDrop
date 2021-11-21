@@ -3,10 +3,6 @@
     <div class="home">
       <h1>home page</h1>
     </div>
-    <!-- <form @submit.prevent="burn">
-      <input type="number" name="number" id="number">
-      <button type="submit">Burn</button>
-    </form> -->
     <div class="gallery">
       <div class="piece" v-for="(nft, index) in metaData" :key="nft.itemData.name">
         <img :src="'data:image/png;base64,' + nft.itemData.image" />
@@ -26,7 +22,7 @@
               :data-hash="nft.itemData.txhash"
             >Mint
             </button>
-            <a href="#" :class="{ sold: !nft.itemData.txhash, hash: true }">{{ nft.itemData.txhash }}</a>
+            <a :href="'https://rinkeby.etherscan.io/tx/' + nft.itemData.txhash" :class="{ sold: !nft.itemData.txhash, hash: true }" target="_blank">See Transaction</a>
           </div>
         </div>
       </div>
@@ -37,13 +33,11 @@
 <script>
 // should I try to not make another fetch when navigating back from another route??
 // @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
 import axios from "axios";
 import Web3 from "web3";
 import { create } from "ipfs-http-client";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
 import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
-
 const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 
 export default {
@@ -84,25 +78,25 @@ export default {
       });
     },
     async web3stuff() {
-      
       const web3 = this.web3;
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = ezDropArtifact.networks[networkId];
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
       // if rinkeby
       if (networkId == 4) {
         this.contract = new web3.eth.Contract(
           ezDropArtifactRinkeby,
           '0xAA8Ac4e956508708218B6c01f21781873421533c'
         );
-      } else {
+      } else if (deployedNetwork) {
         this.contract = new web3.eth.Contract(
           ezDropArtifact.abi,
           deployedNetwork.address
         );
       }
+      // ELSE display notice to connect wallet
 
-      // console.log(this.contract);
       this.account = accounts[0];
     },
     async mintNft(e, index) {
@@ -139,15 +133,6 @@ export default {
       .catch(function(error){
         console.error('FAILURE!!', error);
       });
-    },
-    async burn(e) {
-      // const { _burn } = this.contract.methods;
-      // const number = parseInt(e.target.number.value);
-      // await _burn(number)
-      //   .send({ from: this.account })
-      //   .on('receipt', () => {
-      //     console.log('burned?');
-      //   });
     }
   }
 }

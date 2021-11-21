@@ -84,7 +84,7 @@ router.get('/', async (req, res, next) => {
     }).catch();
 });
 
-router.get('/login', isAuth, (req, res, next) => {
+router.get('/login', (req, res, next) => {
     res.send('already logged in');
 });
 
@@ -98,7 +98,6 @@ router.get('/dashboard', isAuth, async (req, res, next) => {
     }).catch();
 });
 
-// Visiting this route logs the user out
 router.get('/logout', isAuth, (req, res, next) => {
     req.logout();
     res.send('logged out');

@@ -42,7 +42,6 @@ import axios from "axios";
 import Web3 from "web3";
 import ezDropArtifact from "../../../build/contracts/EZDrop.json";
 import ezDropArtifactRinkeby from "../../contracts/ezDrop.json";
-
 const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 axios.defaults.withCredentials = true;
 
@@ -120,14 +119,16 @@ export default {
     getMetadata() {
       axios({
         method: 'get',
-        url: backendUrl,
+        url: `${backendUrl}dashboard`,
         responseType: 'text',
         withCredentials: true
       })
       .then( response => {
+        console.log(response);
         this.$store.state.metaData = response.data.reverse();
+        this.$store.state.loggedIn = true;
       }).catch(error => {
-        this.$router.push('login');
+        this.$router.push('/');
       });
     },
     async web3stuff() {

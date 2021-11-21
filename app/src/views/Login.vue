@@ -20,7 +20,6 @@
 
 <script>
 import axios from "axios";
-
 const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 
 export default {
@@ -33,10 +32,6 @@ export default {
             fetchResults: []
         }
     },
-    created() {
-        this.checkAuth();
-    },
-    // brush up on lifecycle hooks although this ex wont work since we need form data
     // use mounted for web3?
     mounted() {
     },
@@ -65,32 +60,10 @@ export default {
                         this.$router.push('dashboard');
                     } else {
                         // console.log('login not successful');
-                    }
-                    
+                    }   
                 }
             })
             .catch((error) => {
-                console.error("throw error", error);
-            });
-        },
-        checkAuth() {
-            axios({
-                method: 'get',
-                url: `${backendUrl}login`,
-                responseType: 'text',
-                withCredentials: true
-            })
-            .then(async (response) => {
-                const text = await response.data;
-                if (!response.statusText === "OK") {
-                    throw text;
-                } else {
-                    if (text === 'already logged in') {
-                        this.$router.push('dashboard');
-                    }
-                }
-            })
-            .catch(error => {
                 console.error("throw error", error);
             });
         }

@@ -19,7 +19,7 @@ cp app/dist/index.html app/dist/404.html
 # echo 'www.example.com' > CNAME
 
 git add .
-git commit -m $1
+git commit -m $*
 
 # push to regular repo
 git push

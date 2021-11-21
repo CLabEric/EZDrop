@@ -1,11 +1,15 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/dashboard">Dashboard</router-link> |
-      <router-link to="/register">Register</router-link> |
-      <a href="" @click.prevent="logout">Logout</a>
+      <div class="nav-links">
+        <router-link v-if="currentRoute !== 'Home'" to="/">Back to Home</router-link>
+        <router-link v-if="loggedIn && currentRoute == 'Home'" to="/dashboard">Dashboard</router-link>
+        <!-- <router-link to="/register">Register</router-link> -->
+      </div>
+      <div class="nav-auth">
+        <router-link v-if="!loggedIn" to="/login">Login</router-link>
+        <a href="" v-if="loggedIn" @click.prevent="logout">Logout</a>
+      </div>
     </div>
     <router-view/>
   </div>
@@ -13,18 +17,30 @@
 
 <script>
 import axios from "axios";
+const backendUrl = process.env.NODE_ENV === 'production' ? 'https://easydrop.herokuapp.com/' : process.env.VUE_APP_BACKEND_URL;
 
 export default {
+  computed: {
+    loggedIn() {
+      return this.$store.state.loggedIn;
+    },
+    currentRoute() {
+      return this.$route.name;
+    }
+  },
   methods: {
     logout() {
       axios({
         method: 'get',
-        url: `${process.env.BACKEND_URL}logout`,
+        url: `${backendUrl}logout`,
         responseType: 'text',
         withCredentials: true
       })
       .then(() => {
-        this.$router.push('/');
+        this.$store.state.loggedIn = false;
+        if (this.$route.name === 'Dashboard') {
+          this.$router.push('/');
+        }
       })
       .catch(error => {
         console.error('throw error:', error)
@@ -33,7 +49,6 @@ export default {
   }
 }
 </script>
-
 
 <style>
 #app {
@@ -50,6 +65,14 @@ form {
 }
 form > label {
   margin-top: 10px;
+}
+#nav {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 90%;
+}
+.nav-auth {
 }
 .submit {
   margin-top: 15px;
