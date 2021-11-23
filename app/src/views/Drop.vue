@@ -1,11 +1,30 @@
 <template>
   <div id="home">
     <div class="home">
-      <h1>home page</h1>
+      <h1>{{ this.drop.name }}</h1>
     </div>
-    <div class="dropList">
-      <div class="dropList-item" v-for="drop in drops" :key="drop.name">
-        <router-link :to="drop.urlParam">{{ drop.name }}</router-link>
+    <div class="gallery">
+      <div class="piece" v-for="(nft, index) in metaData" :key="nft.itemData.name">
+        <img :src="'data:image/png;base64,' + nft.itemData.image" />
+        <div class="wrapper">
+          <label>{{ nft.itemData.name }}</label>
+          <div class="price">{{ nft.itemData.price }} ETH 
+            <span :class="{ sold: !nft.itemData.txhash }"> -<b> SOLD</b></span>
+          </div>
+          <div class="transaction">
+            <button
+              :class="{ sold: nft.itemData.txhash }"
+              @click="mintNft($event, index)" 
+              :data-name="nft.itemData.name"
+              :data-description="nft.itemData.description"
+              :data-price="nft.itemData.price"
+              :data-image="nft.itemData.image"
+              :data-hash="nft.itemData.txhash"
+            >Mint
+            </button>
+            <a :href="'https://rinkeby.etherscan.io/tx/' + nft.itemData.txhash" :class="{ sold: !nft.itemData.txhash, hash: true }" target="_blank">See Transaction</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -25,7 +44,7 @@ export default {
   name: 'Home',
   data () {
     return {
-      drops: null,
+      drop: this.$route.params.drop,
       web3: null,
       contract: null,
       account: null
@@ -43,15 +62,20 @@ export default {
       );
     }
   },
+  computed: {
+    metaData() {
+      return this.$store.state.metaData;
+    }
+  },
   methods: {
     getMetadata() {
       axios({
         method: 'get',
-        url: backendUrl,
+        url: `${backendUrl}${this.drop}`,
         responseType: 'text'
       })
       .then( response => {
-        this.drops = response.data;
+        this.$store.state.metaData = response.data;
       });
     },
     async web3stuff() {
@@ -118,13 +142,6 @@ export default {
 <style>
 button {
   margin: 5px 0;
-}
-.dropList {
-  width: 100%;
-}
-.dropList-item {
-  font-size: 16px;
-  padding: 5px 0;
 }
 #home {
     align-items: center;

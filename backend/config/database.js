@@ -6,20 +6,13 @@ require('dotenv').config();
  * -------------- DATABASE ----------------
  */
 
-/**
- * Connect to MongoDB Server using the connection string in the `.env` file.  To implement this, place the following
- * string into the `.env` file
- * 
- * DB_STRING=mongodb://<user>:<password>@localhost:27017/database_name
- */ 
-
 const conn = process.env.DB_STRING;
 
 const connection = mongoose.createConnection(conn, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
+const ObjectId = mongoose.Schema.ObjectId;
 // Creates simple schema for a User.  The hash and salt are derived from the user's given password when they register
 const UserSchema = new mongoose.Schema({
     username: String,
@@ -28,13 +21,21 @@ const UserSchema = new mongoose.Schema({
     salt: String
 });
 
+const NFTDropSchema = new mongoose.Schema({
+    name: String,
+    urlParam: String,
+    user: ObjectId
+});
+
 const NFTMetaSchema = new mongoose.Schema({
     itemData: Object,
-    tokenUri: Object
+    nftDrop: ObjectId
 });
 
 
 const User = connection.model('User', UserSchema);
+
+const NFTDrop = connection.model('NFTDrop', NFTDropSchema);
 
 const NFTMeta = connection.model('NFTMeta', NFTMetaSchema);
 

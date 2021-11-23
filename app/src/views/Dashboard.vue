@@ -1,28 +1,42 @@
 <template>
   <div id="dashboard">
-    <h1>This is your dashboard</h1>
+    <h1>{{ dropName }} dashboard</h1>
     <section id="content">
       <div>
-        <form @submit.prevent="handleForm">
-          <div
-            class="imagePreviewWrapper"
-            :style="{ 'background-image': `url(${previewImage})` }"
-            @click="selectImage">
-          </div>
-          <!-- <label for="file">Choose file to upload</label> -->
-          <input type="file" ref="fileInput" @input="pickFile">
-          <label>Name</label>
-          <input type="text" required v-model="name">
-          <label>Description</label>
-          <input type="text" required v-model="description">
-          <label>Price in Eth</label>
-          <input type="number" step="any" required v-model="price">
-          <div class="submit">
-            <button>Submit</button>
-          </div>
-        </form>
-        <div class="withdraw">
+        <div v-if="dropId">
+          <form @submit.prevent="addPiece">
+            <div
+              class="imagePreviewWrapper"
+              :style="{ 'background-image': `url(${previewImage})` }"
+              @click="selectImage">
+            </div>
+            <!-- <label for="file">Choose file to upload</label> -->
+            <input type="file" ref="fileInput" @input="pickFile">
+            <label>Name</label>
+            <input type="text" required v-model="name">
+            <label>Description</label>
+            <input type="text" required v-model="description">
+            <label>Price in Eth</label>
+            <input type="number" step="any" required v-model="price">
+            <div class="submit">
+              <button>Submit</button>
+            </div>
+          </form>
+        </div>
+        <div v-if="dropId" class="withdraw">
           <button @click="withdrawFunds">withdraw funds</button>
+        </div>
+        <div v-if="!dropId">
+          <div class="drop">
+            <h1>Create your Drop</h1>
+          </div>
+          <form @submit.prevent="createDrop">
+            <label>Name</label>
+            <input type="text" required v-model="dropName">
+            <div class="submit">
+              <button>Submit</button>
+            </div>
+          </form>
         </div>
       </div>
       <div class="images">
@@ -48,6 +62,8 @@ axios.defaults.withCredentials = true;
 export default {
   data() {
     return {
+      dropId: null,
+      dropName: null,
       currentImage: null,
       previewImage: null,
       name: null,
@@ -94,12 +110,13 @@ export default {
         this.$emit('input', file[0])
       }
     },
-    handleForm(event) {
+    addPiece(event) {
       const formData = new FormData();
       formData.append('file', this.currentImage);
       formData.append('name', this.name);
       formData.append('description', this.description);
       formData.append('price', this.price);
+      formData.append('dropId', this.dropId);
       axios.post( `${backendUrl}upload`,
         formData,
         {
@@ -116,6 +133,17 @@ export default {
         console.error('FAILURE!!', error);
       });
     },
+    createDrop(event) {
+      const name = this.dropName;
+      const urlParam = name.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
+      axios.post(`${backendUrl}create-drop`,
+        {name, urlParam }
+      )
+      .then(response => {
+        this.dropId = response.data._id;
+      })
+      .catch(error => console.error('FAILURE!!', error));
+    },
     getMetadata() {
       axios({
         method: 'get',
@@ -124,9 +152,15 @@ export default {
         withCredentials: true
       })
       .then( response => {
-        console.log(response);
-        this.$store.state.metaData = response.data.reverse();
-        this.$store.state.loggedIn = true;
+        // console.log(response);
+        if (response.data === 'empty') {
+          console.log('no drops for this user yet');
+        } else {
+          this.$store.state.metaData = response.data.nfts.reverse();
+          this.dropId = response.data.drop.id;
+          this.dropName = response.data.drop.name;
+          this.$store.state.loggedIn = true;
+        }
       }).catch(error => {
         this.$router.push('/');
       });
@@ -177,12 +211,15 @@ export default {
   flex-direction: column;
   width: 90%;
 }
-
 #content {
   display: flex;
   width: 100%;
 }
-
+.drop {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
 .images {
   display: flex;
   flex-wrap: wrap;
@@ -190,7 +227,6 @@ export default {
   margin-left: 15px;
   width: 100%;
 }
-
 .image {
   border: 1px solid black;
   height: 200px;
@@ -199,9 +235,7 @@ export default {
   padding: 10px;
   position: relative;
 }
-
 img {height: unset;}
-
 .imagePreviewWrapper {
   border: 1px solid black;
   width: 300px;

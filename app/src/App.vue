@@ -72,8 +72,6 @@ form > label {
   position: relative;
   width: 90%;
 }
-.nav-auth {
-}
 .submit {
   margin-top: 15px;
   text-align: center;
