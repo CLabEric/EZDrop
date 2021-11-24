@@ -142,6 +142,7 @@ router.get('/login-success', (req, res, next) => {
 });
 
 router.get('/login-failure', (req, res, next) => {
+    console.log('login failure');
     res.send('failure');
 });
 
