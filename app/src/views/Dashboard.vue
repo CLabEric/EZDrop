@@ -152,7 +152,7 @@ export default {
         withCredentials: true
       })
       .then( response => {
-        // console.log(response);
+        console.log(response);
         if (response.data === 'empty') {
           console.log('no drops for this user yet');
         } else {
