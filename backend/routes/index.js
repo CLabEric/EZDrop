@@ -113,6 +113,7 @@ router.get('/dashboard', isAuth, async (req, res, next) => {
     NFTDrop.find({user}).then(results => {
         const length = results.length;
         if (length === 0) {
+            console.log('empty');
             res.send('empty');
         } else {
             // only show first drop for now
@@ -123,6 +124,7 @@ router.get('/dashboard', isAuth, async (req, res, next) => {
             payload.drop.name = results[0].name;
             payload.drop.id = nftDrop;
             NFTMeta.find({nftDrop}).then(results => {
+                console.log('not empty');
                 payload.nfts = results;
                 res.send(payload);
             })
