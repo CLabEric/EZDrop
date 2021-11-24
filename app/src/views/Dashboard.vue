@@ -162,7 +162,8 @@ export default {
           this.$store.state.loggedIn = true;
         }
       }).catch(error => {
-        this.$router.push('/');
+        console.log(error);
+        // this.$router.push('/');
       });
     },
     async web3stuff() {
