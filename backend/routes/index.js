@@ -109,6 +109,7 @@ router.get('/register', isAuth, (req, res, next) => {
 
 router.get('/dashboard', isAuth, async (req, res, next) => {
     const user = req.user._id;
+    console.log('!!!', user);
     NFTDrop.find({user}).then(results => {
         const length = results.length;
         if (length === 0) {
