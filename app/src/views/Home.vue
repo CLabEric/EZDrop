@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <div class="home">
-      <h1>home page</h1>
+      <h1>EZ Drop</h1>
     </div>
     <div class="dropList">
       <div class="dropList-item" v-for="drop in drops" :key="drop.name">
@@ -64,7 +64,7 @@ export default {
       if (networkId == 4) {
         this.contract = new web3.eth.Contract(
           ezDropArtifactRinkeby,
-          '0xAA8Ac4e956508708218B6c01f21781873421533c'
+          '0x253307D78eA869f60C32d1d2eeb6753aB6fb7643'
         );
       } else if (deployedNetwork) {
         this.contract = new web3.eth.Contract(
