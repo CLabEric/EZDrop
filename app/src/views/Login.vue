@@ -32,9 +32,9 @@ export default {
             fetchResults: []
         }
     },
-    created() {
-        this.checkAuth();
-    },
+    // created() {
+    //     this.checkAuth();
+    // },
     // use mounted for web3?
     mounted() {
     },
@@ -60,6 +60,7 @@ export default {
                     throw text;
                 } else {
                     if (text === 'success') {
+                        this.$store.state.loggedIn = true;
                         this.$router.push('dashboard');
                     } else {
                         // console.log('login not successful');
@@ -70,27 +71,27 @@ export default {
                 console.error("throw error", error);
             });
         },
-        checkAuth() {
-            axios({
-                method: 'get',
-                url: `${backendUrl}login`,
-                responseType: 'text',
-                withCredentials: true
-            })
-            .then(async (response) => {
-                const text = await response.data;
-                if (!response.statusText === "OK") {
-                    throw text;
-                } else {
-                    if (text === 'already logged in') {
-                        this.$router.push('dashboard');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error("throw error", error);
-            });
-        }
+        // checkAuth() {
+        //     axios({
+        //         method: 'get',
+        //         url: `${backendUrl}login`,
+        //         responseType: 'text',
+        //         withCredentials: true
+        //     })
+        //     .then(async (response) => {
+        //         const text = await response.data;
+        //         if (!response.statusText === "OK") {
+        //             throw text;
+        //         } else {
+        //             if (text === 'already logged in') {
+        //                 this.$router.push('dashboard');
+        //             }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error("throw error", error);
+        //     });
+        // }
     }
 }
 </script>
