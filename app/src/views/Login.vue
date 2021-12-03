@@ -32,6 +32,9 @@ export default {
             fetchResults: []
         }
     },
+    created() {
+        this.checkAuth();
+    },
     // use mounted for web3?
     mounted() {
     },
@@ -64,6 +67,28 @@ export default {
                 }
             })
             .catch((error) => {
+                console.error("throw error", error);
+            });
+        },
+        checkAuth() {
+            axios({
+                method: 'get',
+                url: `${backendUrl}login`,
+                responseType: 'text',
+                withCredentials: true
+            })
+            .then(async (response) => {
+                const text = await response.data;
+                if (!response.statusText === "OK") {
+                    throw text;
+                } else {
+                    if (text === 'already logged in') {
+                        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!1');
+                        // this.$router.push('dashboard');
+                    }
+                }
+            })
+            .catch(error => {
                 console.error("throw error", error);
             });
         }

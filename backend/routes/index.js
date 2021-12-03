@@ -99,7 +99,7 @@ router.get('/', async (req, res, next) => {
     }).catch();
 });
 
-router.get('/login', (req, res, next) => {
+router.get('/login', isAuth, (req, res, next) => {
     res.send('already logged in');
 });
 
