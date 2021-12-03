@@ -8,7 +8,7 @@ const connection = require('./config/database');
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
 const MongoStore = require('connect-mongo')(session);
-const cookieParser = require('cookie-parser')
+// const cookieParser = require('cookie-parser');
 
 /**
  * -------------- GENERAL SETUP ----------------
@@ -34,15 +34,16 @@ const sessionStore = new MongoStore({
     mongooseConnection: connection, 
     collection: 'sessions' 
 });
-app.use(cookieParser());
+// app.use(cookieParser());
 app.enable('trust proxy');
 app.use(session({
     secret: process.env.SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     proxy: true,
     store: sessionStore,
     cookie: {
+        secure: true,
         maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
     }
 }));
