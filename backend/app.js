@@ -8,6 +8,7 @@ const connection = require('./config/database');
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
 const MongoStore = require('connect-mongo')(session);
+const cookieParser = require('cookie-parser')
 
 /**
  * -------------- GENERAL SETUP ----------------
@@ -33,6 +34,7 @@ const sessionStore = new MongoStore({
     mongooseConnection: connection, 
     collection: 'sessions' 
 });
+app.use(cookieParser());
 app.enable('trust proxy');
 app.use(session({
     secret: process.env.SECRET,
