@@ -77,7 +77,7 @@ export default {
                     throw text;
                 } else {
                     if (text === 'already logged in') {
-                        this.$router.push('dashboard');
+                        // this.$router.push('dashboard');
                     }
                 }
             })

@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema({
 const NFTDropSchema = new mongoose.Schema({
     name: String,
     urlParam: String,
+    alreadyHasMeta: Boolean,
     user: ObjectId
 });
 

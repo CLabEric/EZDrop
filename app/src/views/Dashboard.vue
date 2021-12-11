@@ -3,7 +3,7 @@
     <h1>{{ dropName }} dashboard</h1>
     <section id="content">
       <div>
-        <div v-if="dropId">
+        <div v-if="dropId && !haveMeta">
           <form @submit.prevent="addPiece">
             <div
               class="imagePreviewWrapper"
@@ -23,6 +23,21 @@
             </div>
           </form>
         </div>
+        <div v-else-if="dropId && haveMeta">
+          <p>upload multiple files at once</p>
+          <form @submit.prevent="submitAssets">
+            <label class="notice">Each image MUST have a corresponding metadata object</label>
+            <label>Images</label>
+            <input type="file" id="imageFolder" name="fileList" webkitdirectory multiple />
+            <!-- <input type="file" ref="fileInput" @input=""> -->
+            <label>Metadata</label>
+            <!-- <input type="file" ref="fileInput" @input=""> -->
+            <input type="file" id="metaDataFile" name="file" />
+            <div class="submit">
+              <button>Submit</button>
+            </div>
+          </form>
+        </div>
         <div v-if="dropId" class="withdraw">
           <button @click="withdrawFunds">withdraw funds</button>
         </div>
@@ -33,6 +48,9 @@
           <form @submit.prevent="createDrop">
             <label>Name</label>
             <input type="text" required v-model="dropName">
+            <label>Already have metadata?</label>
+            <input type="checkbox" required v-model="haveMeta">
+            <label :class="[haveMeta ? 'notice' : 'warning']">{{ haveMeta ? 'this is the faster way' : 'must upload one at a time' }}</label>
             <div class="submit">
               <button>Submit</button>
             </div>
@@ -63,6 +81,7 @@ export default {
   data() {
     return {
       dropId: null,
+      haveMeta: true,
       dropName: null,
       currentImage: null,
       previewImage: null,
@@ -133,11 +152,43 @@ export default {
         console.error('FAILURE!!', error);
       });
     },
+
+    // this gets called when submitting a whole drop at once
+    submitAssets(event) {
+      const formData = new FormData();
+      const files = event.target[0].files;
+      const metaData = event.target[1].files;
+
+      formData.append('dropId', this.dropId);
+      for (let i = 0; i < files.length; i++) {
+        let assetId = files[i].name.split('.')[0];
+        formData.append(`file-${assetId}`, files[i]);
+      }
+      formData.append('metadata', metaData[0]);
+
+      axios.post( `${backendUrl}upload`,
+        formData,
+        {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+        }
+      ).
+      then( response => {
+        console.log(response);
+        this.getMetadata();
+      })
+      .catch(function(error){
+        console.error('FAILURE!!', error);
+      });
+
+    },
     createDrop(event) {
       const name = this.dropName;
       const urlParam = name.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
+      const alreadyHasMeta = this.haveMeta;
       axios.post(`${backendUrl}create-drop`,
-        {name, urlParam }
+        {name, urlParam, alreadyHasMeta }
       )
       .then(response => {
         this.dropId = response.data._id;
@@ -152,13 +203,14 @@ export default {
         withCredentials: true
       })
       .then( response => {
-        // console.log('1', response);
+        console.log(response);
         if (response.data === 'empty') {
           console.log('no drops for this user yet');
         } else {
           this.$store.state.metaData = response.data.nfts.reverse();
           this.dropId = response.data.drop.id;
           this.dropName = response.data.drop.name;
+          this.haveMeta = response.data.drop.alreadyHasMeta;
           this.$store.state.loggedIn = true;
         }
       }).catch(error => {
@@ -248,5 +300,11 @@ img {height: unset;}
 .name {
   position: absolute;
   bottom: 5px;
+}
+.notice {
+  color: green;
+}
+.warning {
+  color: orange;
 }
 </style>

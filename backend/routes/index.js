@@ -47,33 +47,69 @@ router.post('/create-drop', (req, res, next) => {
     const name = req.body.name;
     const urlParam = name.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
     const user = req.user._id;
-    const newNFTDrop = new NFTDrop({ name, user, urlParam });
+    // drop is created all at once vs one at a time
+    const alreadyHasMeta = req.body.alreadyHasMeta;
+    const newNFTDrop = new NFTDrop({ name, urlParam, alreadyHasMeta, user });
 
     newNFTDrop.save()
     .then(nftDrop => {
+        console.log('**', nftDrop);
         res.send(nftDrop);
     });
 });
 
  router.post('/upload', async (req, res, next) => {
     const nftDrop = req.body.dropId;
-    const itemData = {
-        'name'        : req.body.name,
-        'price'       : req.body.price,
-        'description' : req.body.description,
-        'image'       : req.files.file.data,
-        'txhash'      : ''
-    };
-    const newNFTMeta = new NFTMeta({
-        itemData, 
-        nftDrop
-    });
 
-    newNFTMeta.save()
-        .then((nftMeta) => {
-            res.send(nftMeta);
-        });
+    NFTDrop
+    .findById(req.body.dropId)
+    .then(drop => {
+        const files = req.files;
+        const metadataObject = JSON.parse( files['metadata'].data.toString('utf-8') );
 
+        if (drop.alreadyHasMeta) {
+            Object.keys(metadataObject).forEach(metadataKey => {
+                const singleMetaObject = metadataObject[metadataKey];
+                const singleFilekey = `file-${singleMetaObject.edition}`;
+                const image = files[singleFilekey].data;
+                const itemData = {
+                    'name'        : singleMetaObject.name,
+                    'price'       : '0.0001',
+                    'description' : singleMetaObject.description,
+                    'image'       : image,
+                    'attributes'  : singleMetaObject.attributes,
+                    'txhash'      : ''
+                };
+                const newNFTMeta = new NFTMeta({
+                    itemData, 
+                    nftDrop
+                });
+                newNFTMeta.save()
+                .then((nftMeta) => {
+                    console.log(nftMeta.itemData.name, 'added to database');
+                });
+            });
+            res.send('drop created');
+        } else {
+            const itemData = {
+                'name'        : req.body.name,
+                'price'       : req.body.price,
+                'description' : req.body.description,
+                'image'       : req.files.file.data,
+                'txhash'      : ''
+            };
+            const newNFTMeta = new NFTMeta({
+                itemData, 
+                nftDrop
+            });
+
+            newNFTMeta.save()
+                .then((nftMeta) => {
+                    res.send(nftMeta);
+                });
+        }
+    })
+    .catch(error => console.log('error:', error));
  });
 
  router.post('/setHash', (req, res, next) => {
@@ -109,7 +145,7 @@ router.get('/register', isAuth, (req, res, next) => {
 
 router.get('/dashboard', isAuth, async (req, res, next) => {
     const user = req.user._id;
-    console.log('!!!', user);
+
     NFTDrop.find({user}).then(results => {
         const length = results.length;
         if (length === 0) {
@@ -123,9 +159,11 @@ router.get('/dashboard', isAuth, async (req, res, next) => {
             const nftDrop = results[0]._id;
             payload.drop.name = results[0].name;
             payload.drop.id = nftDrop;
+            payload.drop.alreadyHasMeta = results[0].alreadyHasMeta;
             NFTMeta.find({nftDrop}).then(results => {
-                console.log('not empty');
+                
                 payload.nfts = results;
+                console.log('not empty', payload);
                 res.send(payload);
             })
             .catch();

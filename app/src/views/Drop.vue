@@ -18,10 +18,12 @@
               :data-name="nft.itemData.name"
               :data-description="nft.itemData.description"
               :data-price="nft.itemData.price"
+              :data-attributes=JSON.stringify(nft.itemData.attributes)
               :data-image="nft.itemData.image"
               :data-hash="nft.itemData.txhash"
             >Mint
             </button>
+            {{ typeof nft.itemData.attributes }}
             <a :href="'https://rinkeby.etherscan.io/tx/' + nft.itemData.txhash" :class="{ sold: !nft.itemData.txhash, hash: true }" target="_blank">See Transaction</a>
           </div>
         </div>
@@ -76,6 +78,7 @@ export default {
       })
       .then( response => {
         this.$store.state.metaData = response.data;
+        console.log(this.$store.state.metaData);
       });
     },
     async web3stuff() {
@@ -106,11 +109,17 @@ export default {
       const weiValue = Web3.utils.toWei(e.target.dataset.price, 'ether');
       const image = new Buffer.from(e.target.dataset.image, 'base64');
       const fileHash = await ipfs.add(image);
+      const attributes = {};
       const tokenMeta = {
           "name": e.target.dataset.name,
           "description": e.target.dataset.description,
           "image": "https://ipfs.io/ipfs/" + fileHash.path
       };
+      JSON.parse(e.target.dataset.attributes).forEach(element => {
+        attributes[element.trait_type] = element.value;
+      });
+      tokenMeta['attributes'] = attributes;
+
       const tokenURI = await ipfs.add(JSON.stringify(tokenMeta));
       await mint(tokenURI.path)
         .send({ from: this.account, value: parseInt(weiValue) })
@@ -162,7 +171,7 @@ button {
   display: flex;
   flex-direction: column;
   margin: 5px;
-  height: 325px;
+  height: 380px;
   width: 300px;
   padding: 10px;
 }

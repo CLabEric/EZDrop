@@ -145,7 +145,7 @@ button {
   display: flex;
   flex-direction: column;
   margin: 5px;
-  height: 325px;
+  height: 380px;
   width: 300px;
   padding: 10px;
 }
