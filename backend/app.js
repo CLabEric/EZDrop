@@ -40,7 +40,7 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-    proxy: true,
+    // proxy: true,
     store: sessionStore,
     cookie: {
         // sameSite:'none',
