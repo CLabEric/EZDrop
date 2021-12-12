@@ -1,7 +1,12 @@
 <template>
-  <div id="home">
+  <div id="drop">
     <div class="home">
-      <h1>{{ this.drop.name }}</h1>
+      <h1>welcome to: {{ this.drop.name }}</h1>
+      <div id="walletConnect">
+        <button v-if="web3" @click="connectToNetwork()" :disabled='disabled'>connect</button>
+        &nbsp;
+        <p :class="[account ? 'walletConnect-connected' : 'walletConnect-blocked']">{{ connectionMessage }}</p>
+      </div>
     </div>
     <div class="gallery">
       <div class="piece" v-for="(nft, index) in metaData" :key="nft.itemData.name">
@@ -49,7 +54,9 @@ export default {
       drop: this.$route.params.drop,
       web3: null,
       contract: null,
-      account: null
+      account: null,
+      connectionMessage: 'please connect your wallet',
+      disabled: false
     }
   },
   created() {
@@ -57,11 +64,12 @@ export default {
     if (window.ethereum) {
       const web3 = new Web3(window.ethereum);
       this.web3 = web3;
-      this.web3stuff();
+      // this.web3stuff();
     } else {
       console.warn(
         "No web3 detected."
       );
+      this.connectionMessage = 'please install metamask';
     }
   },
   computed: {
@@ -78,28 +86,37 @@ export default {
       })
       .then( response => {
         this.$store.state.metaData = response.data;
-        console.log(this.$store.state.metaData);
+        // console.log(response);
       });
     },
-    async web3stuff() {
+    async connectToNetwork() {
+      this.disabled = true;
+      // request will hang if not logged in
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       const web3 = this.web3;
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = ezDropArtifact.networks[networkId];
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
+      // if mainnet
+      if (networkId == 1) {
+        this.connectionMessage = 'connected to Ethereum Mainnet';
       // if rinkeby
-      if (networkId == 4) {
+      } else if (networkId == 4) {
+        this.connectionMessage = 'connected to Rinkeby Test Network';
         this.contract = new web3.eth.Contract(
           ezDropArtifactRinkeby,
           '0x253307D78eA869f60C32d1d2eeb6753aB6fb7643'
         );
       } else if (deployedNetwork) {
+        this.connectionMessage = 'connected to local Ganache network';
         this.contract = new web3.eth.Contract(
           ezDropArtifact.abi,
           deployedNetwork.address
         );
+      } else {
+        this.connectionMessage = 'Please connect to a Rinkeby or Mainnet';
+        return;
       }
-      // ELSE display notice to connect wallet
 
       this.account = accounts[0];
     },
@@ -152,7 +169,7 @@ export default {
 button {
   margin: 5px 0;
 }
-#home {
+#drop {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -190,6 +207,13 @@ label {
 }
 .sold { display: none; }
 .transaction { height: 32px; }
+#walletConnect {
+  display: flex;
+  flex-direction: row;
+}
+.walletConnect-blocked { color: red; }
+.walletConnect-connected { color: green; }
+.walletConnect-pending { color: orange; }
 .wrapper {
   background-color: white;
   display: flex;

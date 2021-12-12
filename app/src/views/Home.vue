@@ -33,15 +33,6 @@ export default {
   },
   created() {
     this.getMetadata();
-    if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
-      this.web3 = web3;
-      this.web3stuff();
-    } else {
-      console.warn(
-        "No web3 detected."
-      );
-    }
   },
   methods: {
     getMetadata() {
@@ -53,28 +44,6 @@ export default {
       .then( response => {
         this.drops = response.data;
       });
-    },
-    async web3stuff() {
-      const web3 = this.web3;
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = ezDropArtifact.networks[networkId];
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      // if rinkeby
-      if (networkId == 4) {
-        this.contract = new web3.eth.Contract(
-          ezDropArtifactRinkeby,
-          '0x253307D78eA869f60C32d1d2eeb6753aB6fb7643'
-        );
-      } else if (deployedNetwork) {
-        this.contract = new web3.eth.Contract(
-          ezDropArtifact.abi,
-          deployedNetwork.address
-        );
-      }
-      // ELSE display notice to connect wallet
-
-      this.account = accounts[0];
     },
     async mintNft(e, index) {
       const { mint } = this.contract.methods;

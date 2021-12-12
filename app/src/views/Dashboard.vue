@@ -10,7 +10,6 @@
               :style="{ 'background-image': `url(${previewImage})` }"
               @click="selectImage">
             </div>
-            <!-- <label for="file">Choose file to upload</label> -->
             <input type="file" ref="fileInput" @input="pickFile">
             <label>Name</label>
             <input type="text" required v-model="name">
@@ -29,9 +28,7 @@
             <label class="notice">Each image MUST have a corresponding metadata object</label>
             <label>Images</label>
             <input type="file" id="imageFolder" name="fileList" webkitdirectory multiple />
-            <!-- <input type="file" ref="fileInput" @input=""> -->
             <label>Metadata</label>
-            <!-- <input type="file" ref="fileInput" @input=""> -->
             <input type="file" id="metaDataFile" name="file" />
             <div class="submit">
               <button>Submit</button>
