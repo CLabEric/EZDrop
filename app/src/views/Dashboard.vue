@@ -46,7 +46,7 @@
             <label>Name</label>
             <input type="text" required v-model="dropName">
             <label>Already have metadata?</label>
-            <input type="checkbox" required v-model="haveMeta">
+            <input type="checkbox" v-model="haveMeta">
             <label :class="[haveMeta ? 'notice' : 'warning']">{{ haveMeta ? 'this is the faster way' : 'must upload one at a time' }}</label>
             <div class="submit">
               <button>Submit</button>
