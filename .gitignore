@@ -4,4 +4,5 @@ deploy.sh
 build/
 contracts/
 node_modules/
+app/dist/
 package-lock.json
