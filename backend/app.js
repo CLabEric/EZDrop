@@ -44,7 +44,8 @@ const sessionStore = new MongoStore({
     collection: 'sessions' 
 });
 // app.use(cookieParser());
-app.enable('trust proxy');
+// app.enable('trust proxy');
+app.set('trust proxy', 1);
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
