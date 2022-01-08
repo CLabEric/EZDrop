@@ -25,6 +25,7 @@ app.use(cors({
     credentials: true
 }));
 
+// did this do anything to set cookies?
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -44,12 +45,12 @@ const sessionStore = new MongoStore({
     collection: 'sessions' 
 });
 // app.use(cookieParser());
-// app.enable('trust proxy');
-app.set('trust proxy', 1);
+// also tried app.set('trust proxy', 1);
+app.enable('trust proxy');
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     // proxy: true,
     store: sessionStore,
     // setting cookie object seems to result in cookie not being created
