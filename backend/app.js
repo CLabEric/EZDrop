@@ -21,7 +21,7 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
-    origin: process.env.ORIGIN || "http://localhost:8081",
+    origin: process.env.ORIGIN || "http://localhost:3001",
     credentials: true
 }));
 app.use(fileUpload());
@@ -81,3 +81,4 @@ app.use(routes);
 
 // Server listens on http://localhost:3000
 app.listen(process.env.PORT || 3000);
+console.log('listening....');

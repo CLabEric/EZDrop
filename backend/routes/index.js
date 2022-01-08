@@ -186,14 +186,14 @@ router.get('/login-failure', (req, res, next) => {
     res.send('failure');
 });
 
-router.get('/:drop', async (req, res, next) => {
-    const urlParam = req.params.drop;
-    NFTDrop.find({urlParam}).then( results => {
-        const nftDrop = results[0]._id;
-        NFTMeta.find({nftDrop}).then(results => {
-            res.send( results )
-        }).catch();
-    }).catch();
-});
+// router.get('/:drop', async (req, res, next) => {
+//     const urlParam = req.params.drop;
+//     NFTDrop.find({urlParam}).then( results => {
+//         const nftDrop = results[0]._id;
+//         NFTMeta.find({nftDrop}).then(results => {
+//             res.send( results )
+//         }).catch();
+//     }).catch();
+// });
 
 module.exports = router;
