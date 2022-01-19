@@ -13,6 +13,8 @@ const connection = mongoose.createConnection(conn, {
     useUnifiedTopology: true
 });
 const ObjectId = mongoose.Schema.ObjectId;
+// const Integer = mongoose.Schema.Integer;
+mongoose.set('useFindAndModify', false);
 // Creates simple schema for a User.  The hash and salt are derived from the user's given password when they register
 const UserSchema = new mongoose.Schema({
     username: String,
@@ -22,10 +24,13 @@ const UserSchema = new mongoose.Schema({
 });
 
 const NFTDropSchema = new mongoose.Schema({
-    name: String,
+    userId: Number,
+    title: String,
     urlParam: String,
-    alreadyHasMeta: Boolean,
-    user: ObjectId
+    type: String,
+    price: Number,
+    description: String,
+    traits: Array
 });
 
 const NFTMetaSchema = new mongoose.Schema({

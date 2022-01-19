@@ -50,7 +50,8 @@ app.enable('trust proxy');
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    // also tried true
+    saveUninitialized: false,
     // proxy: true,
     store: sessionStore,
     // setting cookie object seems to result in cookie not being created
