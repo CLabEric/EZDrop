@@ -98,7 +98,9 @@ router.get('/drop', async (req, res, next) => {
     .then(results => {
         const nftDrop = results[0]._id;
         const payload = {
-            title: results[0].title
+            title: results[0].title,
+            description: results[0].description,
+            price: results[0].price
         }
         NFTMeta
         .find({nftDrop})
