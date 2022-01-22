@@ -2,7 +2,6 @@ const router = require('express').Router();
 const passport = require('passport');
 const genPassword = require('../lib/passwordUtils').genPassword;
 const connection = require('../config/database');
-const User = connection.models.User;
 const NFTMeta = connection.models.NFTMeta;
 const NFTDrop = connection.models.NFTDrop;
 const isAuth = require('./authMiddleware').isAuth;
@@ -12,7 +11,7 @@ const jwt = require("jsonwebtoken");
 
 function authenticateToken(req, res, next) {
     // Read the JWT access token from the request header
-    console.log(req.headers)
+    // console.log(req.headers)
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
 
@@ -81,6 +80,13 @@ router.post('/configure-drop', (req, res, next) => {
     .catch(error => console.log('error:', error));
  });
 
+ router.delete('/delete', async (req, res, next) => {
+    NFTMeta
+    .findByIdAndDelete( req.body.currentId )
+    .then( result => res.send(result) )
+    .catch(error => console.error(error));
+ });
+
  /**
  * -------------- GET ROUTES ----------------
  */
@@ -89,6 +95,14 @@ router.get('/', async (req, res, next) => {
     NFTDrop.find().then( results => {
         res.send( results )
     }).catch();
+});
+
+router.get('/single', async (req, res, next) => {
+    // maybe randomize?
+    // also delete from db
+    NFTMeta.findOne()
+    .then(response => res.send(response))
+    .catch(error => console.error(error));
 });
 
 router.get('/drop', async (req, res, next) => {
