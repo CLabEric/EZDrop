@@ -5,7 +5,6 @@ const connection = require('../config/database');
 const NFTMeta = connection.models.NFTMeta;
 const NFTDrop = connection.models.NFTDrop;
 const isAuth = require('./authMiddleware').isAuth;
-const isAdmin = require('./authMiddleware').isAdmin;
 
 const jwt = require("jsonwebtoken"); 
 
@@ -41,9 +40,11 @@ router.post('/create-drop', (req, res, next) => {
 });
 
 router.post('/configure-drop', (req, res, next) => {
-    const { id, price, description, traits } = req.body;
+    const { id, price, blurb, description, traits } = req.body;
+    const data = { price, blurb, description, traits: JSON.parse(req.body.traits) }
+    if (req.files) data.thumbnail = req.files.file.data;
     NFTDrop
-    .findByIdAndUpdate(id, {price, description, traits}, {returnDocument: 'after'})
+    .findByIdAndUpdate(id, data, {returnDocument: 'after'})
     .then(results => {
         console.log(results);
         res.send(results);
@@ -54,7 +55,7 @@ router.post('/configure-drop', (req, res, next) => {
     });
 });
 
- router.post('/upload', async (req, res, next) => {
+router.post('/upload', async (req, res, next) => {
     const nftDrop = req.body.dropId;
 
     NFTDrop
@@ -78,7 +79,7 @@ router.post('/configure-drop', (req, res, next) => {
         });
     })
     .catch(error => console.log('error:', error));
- });
+});
 
  router.delete('/delete', async (req, res, next) => {
     NFTMeta

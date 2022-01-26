@@ -15,13 +15,6 @@ const connection = mongoose.createConnection(conn, {
 const ObjectId = mongoose.Schema.ObjectId;
 // const Integer = mongoose.Schema.Integer;
 mongoose.set('useFindAndModify', false);
-// Creates simple schema for a User.  The hash and salt are derived from the user's given password when they register
-const UserSchema = new mongoose.Schema({
-    username: String,
-    email: String,
-    hash: String,
-    salt: String
-});
 
 const NFTDropSchema = new mongoose.Schema({
     userId: Number,
@@ -29,6 +22,8 @@ const NFTDropSchema = new mongoose.Schema({
     urlParam: String,
     type: String,
     price: Number,
+    blurb: String,
+    thumbnail: Object,
     description: String,
     traits: Array
 });
@@ -37,9 +32,6 @@ const NFTMetaSchema = new mongoose.Schema({
     itemData: Object,
     nftDrop: ObjectId
 });
-
-
-const User = connection.model('User', UserSchema);
 
 const NFTDrop = connection.model('NFTDrop', NFTDropSchema);
 
