@@ -30,18 +30,19 @@ function authenticateToken(req, res, next) {
 router.post('/create-drop', (req, res, next) => {
     const { title, userId, type } = req.body;
     const urlParam = title.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
-    const newNFTDrop = new NFTDrop({ userId, title, urlParam, type });
+    const newNFTDrop = new NFTDrop(
+        { userId, title, urlParam, type, published: false }
+    );
 
     newNFTDrop.save()
     .then(nftDrop => {
-        console.log('**', nftDrop);
         res.send(nftDrop);
     });
 });
 
 router.post('/configure-drop', (req, res, next) => {
     const { id, price, blurb, description, traits } = req.body;
-    const data = { price, blurb, description, traits: JSON.parse(req.body.traits) }
+    const data = { price, blurb, description, traits: JSON.parse(req.body.traits) };
     if (req.files) data.thumbnail = req.files.file.data;
     NFTDrop
     .findByIdAndUpdate(id, data, {returnDocument: 'after'})
@@ -81,21 +82,42 @@ router.post('/upload', async (req, res, next) => {
     .catch(error => console.log('error:', error));
 });
 
- router.delete('/delete', async (req, res, next) => {
+router.delete('/delete', async (req, res, next) => {
     NFTMeta
     .findByIdAndDelete( req.body.currentId )
     .then( result => res.send(result) )
     .catch(error => console.error(error));
- });
+});
+
+router.post('/publish', (req, res, next) => {
+    const { id } = req.body;
+
+    NFTDrop
+    .findByIdAndUpdate(id, {published: true}, {returnDocument: 'after'})
+    .then(results => {
+        console.log(results);
+        res.send(results);
+    })
+    .catch(error => { 
+        console.log(error);
+        res.send(error);
+    });
+
+});
 
  /**
  * -------------- GET ROUTES ----------------
  */
 
 router.get('/', async (req, res, next) => {
-    NFTDrop.find().then( results => {
+    NFTDrop
+    .find()
+    .where('published')
+    .equals(true)
+    .then(results => {
         res.send( results )
-    }).catch();
+    })
+    .catch(error => console.log(error));
 });
 
 router.get('/single', async (req, res, next) => {
