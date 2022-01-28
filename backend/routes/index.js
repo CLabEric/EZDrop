@@ -89,6 +89,20 @@ router.delete('/delete', async (req, res, next) => {
     .catch(error => console.error(error));
 });
 
+router.post('/contract', (req, res, next) => {
+    const { id, abi, address } = req.body;
+
+    NFTDrop
+    .findByIdAndUpdate(id, {abi: JSON.parse(abi), address}, {returnDocument: 'after'})
+    .then(results => {
+        res.send(results);
+    })
+    .catch(error => { 
+        console.log(error);
+        res.send(error);
+    });
+});
+
 router.post('/publish', (req, res, next) => {
     const { id } = req.body;
 
@@ -137,7 +151,9 @@ router.get('/drop', async (req, res, next) => {
         const payload = {
             title: results[0].title,
             description: results[0].description,
-            price: results[0].price
+            price: results[0].price,
+            abi: results[0].abi,
+            address: results[0].address
         }
         NFTMeta
         .find({nftDrop})
