@@ -34,7 +34,9 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(fileUpload());
+app.use(fileUpload({
+    createParentPath: true
+}));
 
 /**
  * -------------- SESSION SETUP ----------------
@@ -44,23 +46,12 @@ const sessionStore = new MongoStore({
     mongooseConnection: connection, 
     collection: 'sessions' 
 });
-// app.use(cookieParser());
-// also tried app.set('trust proxy', 1);
 app.enable('trust proxy');
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    // also tried true
     saveUninitialized: false,
-    // proxy: true,
-    store: sessionStore,
-    // setting cookie object seems to result in cookie not being created
-    // cookie: {
-        // sameSite: true,
-        // sameSite:'none',
-        // secure: true,
-        // maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
-    // }
+    store: sessionStore
 }));
 
 /**

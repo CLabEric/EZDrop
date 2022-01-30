@@ -1,6 +1,7 @@
 .*
 !/.gitignore
 deploy.sh
+backend/uploads/
 build/
 contracts/
 node_modules/

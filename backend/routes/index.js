@@ -5,8 +5,9 @@ const connection = require('../config/database');
 const NFTMeta = connection.models.NFTMeta;
 const NFTDrop = connection.models.NFTDrop;
 const isAuth = require('./authMiddleware').isAuth;
-
+const path = require('path');
 const jwt = require("jsonwebtoken"); 
+const fs = require('fs');
 
 function authenticateToken(req, res, next) {
     // Read the JWT access token from the request header
@@ -80,6 +81,40 @@ router.post('/upload', async (req, res, next) => {
         });
     })
     .catch(error => console.log('error:', error));
+});
+
+// array gets overloaded if this is called multiple times
+// see if can check for uniqueness of layers in array in db
+// can I use await for layers.mv? Can I do this w fs?
+router.post('/upload-layers', (req, res, next) => {
+    const { id, attribute } = req.body;
+    const files = req.files;
+
+    // no error handler in for loop, it doesnt play with db call so come up w
+    // another way to validate layers were added correctly
+    for (const file in files) {
+        const layer = files[file];
+        layer.mv( 
+            `${path.join(__dirname, '../')}uploads/${id}/${attribute}/${layer.name}`
+        );
+    }
+
+    NFTDrop
+    .findByIdAndUpdate(
+        id,
+        { $push: {
+            layers: attribute
+        }},
+        {returnDocument: 'after'}
+    )
+    .then(results => {
+        res.send(results);
+    })
+    .catch(error => {
+        console.error(error);
+        res.send(error);
+    });
+
 });
 
 router.delete('/delete', async (req, res, next) => {
@@ -205,6 +240,22 @@ router.get('/login-success', (req, res, next) => {
 router.get('/login-failure', (req, res, next) => {
     console.log('login failure');
     res.send('failure');
+});
+
+router.get('/random-image', async (req, res, next) => {
+    const id = req.query.id;
+    const dropPath = `${path.join(__dirname, '../')}uploads/${id}/`;
+    const dropFolder = await fs.readdirSync(dropPath);
+    const singleNftTraits = [];
+
+    dropFolder.forEach(traitFolder => {
+        const traitFile = fs.readdirSync(`${dropPath}${traitFolder}`)[0];
+        const trait = fs.readFileSync(`${dropPath}${traitFolder}/${traitFile}`);
+        
+        singleNftTraits.push(trait);
+    });
+    res.setHeader('Content-Type', 'image/png');
+    res.send(singleNftTraits);
 });
 
 module.exports = router;

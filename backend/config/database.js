@@ -28,7 +28,8 @@ const NFTDropSchema = new mongoose.Schema({
     traits: Array,
     published: Boolean,
     abi: Object,
-    address: String
+    address: String,
+    layers: Array
 });
 
 const NFTMetaSchema = new mongoose.Schema({
