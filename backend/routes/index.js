@@ -87,9 +87,10 @@ router.post('/upload', async (req, res, next) => {
 // see if can check for uniqueness of layers in array in db
 // can I use await for layers.mv? Can I do this w fs?
 router.post('/upload-layers', (req, res, next) => {
-    const { id, attribute } = req.body;
+    const { id, attribute, rank } = req.body;
     const files = req.files;
 
+    // upload layers for this trait to filesystem
     // no error handler in for loop, it doesnt play with db call so come up w
     // another way to validate layers were added correctly
     for (const file in files) {
@@ -102,9 +103,11 @@ router.post('/upload-layers', (req, res, next) => {
     NFTDrop
     .findByIdAndUpdate(
         id,
-        { $push: {
-            layers: attribute
-        }},
+        { 
+            $push: {
+                layers: { [attribute] : parseInt(rank) }
+            } 
+        },
         {returnDocument: 'after'}
     )
     .then(results => {
@@ -246,16 +249,163 @@ router.get('/random-image', async (req, res, next) => {
     const id = req.query.id;
     const dropPath = `${path.join(__dirname, '../')}uploads/${id}/`;
     const dropFolder = await fs.readdirSync(dropPath);
-    const singleNftTraits = [];
 
-    dropFolder.forEach(traitFolder => {
-        const traitFile = fs.readdirSync(`${dropPath}${traitFolder}`)[0];
-        const trait = fs.readFileSync(`${dropPath}${traitFolder}/${traitFile}`);
+    NFTDrop
+    .findById(id)
+    .then(async drop => {
+        const { layers } = drop;
+        const sortedLayerItems = [];
+        const randomized = JSON.parse( fs.readFileSync(`${dropPath}randomized`) );
+        const randomIdx = Math.floor(Math.random() * randomized.length);
+        const random = randomized[randomIdx];
+
+        // sort layers by order
+        layers.sort((layer1, layer2) => {
+            const attribute1 = Object.keys(layer1)[0];
+            const attribute2 = Object.keys(layer2)[0];
+            const rank1 = layer1[attribute1];
+            const rank2 = layer2[attribute2];
+
+            return rank1 - rank2;
+        })
         
-        singleNftTraits.push(trait);
-    });
-    res.setHeader('Content-Type', 'image/png');
-    res.send(singleNftTraits);
+        for (let i = 0; i < random.length; i++) {
+            const layer = Object.keys(layers[i])[0];
+            const imgIdx = random[i];
+            const imageName = fs.readdirSync(`${dropPath}${layer}`)[imgIdx - 1];
+            const image = fs.readFileSync(`${dropPath}${layer}/${imageName}`);
+            sortedLayerItems.push(image)
+        }
+
+
+        res.send(sortedLayerItems);
+    })
+    .catch(err => console.error(err));
+});
+
+router.get('/randomize-traits', (req, res, next) => {
+    const id = req.query.id; // id of drop
+    const dropPath = `${path.join(__dirname, '../')}uploads/${id}/`;
+
+    const combineArrays = ( array_of_arrays ) => {
+        // First, handle some edge cases
+        if( !array_of_arrays || !Array.isArray(array_of_arrays) || array_of_arrays.length == 0 ) return [];
+        for( let i = 0 ; i < array_of_arrays.length; i++ ){
+            if( ! Array.isArray(array_of_arrays[i]) || array_of_arrays[i].length == 0 ){
+                // If any of the arrays in array_of_arrays are not arrays or zero-length, return an empty array...
+                return [];
+            }
+        }
+    
+        // Start "odometer" with a 0 for each array in array_of_arrays.
+        let odometer = new Array( array_of_arrays.length );
+        odometer.fill( 0 ); 
+    
+        let output = [];
+        let newCombination = formCombination( odometer, array_of_arrays );
+    
+        output.push( newCombination );
+    
+        while ( odometer_increment( odometer, array_of_arrays ) ){
+            newCombination = formCombination( odometer, array_of_arrays );
+            output.push( newCombination );
+        }
+    
+        return output;
+    }/* combineArrays() */
+    
+    // Translate "odometer" to combinations from array_of_arrays
+    const formCombination = ( odometer, array_of_arrays ) => {
+        // In Imperative Programmingese (i.e., English):
+        // let s_output = "";
+        // for( let i=0; i < odometer.length; i++ ){
+        //    s_output += "" + array_of_arrays[i][odometer[i]]; 
+        // }
+        // return s_output;
+    
+        // In Functional Programmingese (Henny Youngman one-liner):
+        return odometer.reduce(
+          function(accumulator, odometer_value, odometer_index){
+            return "" + accumulator + array_of_arrays[odometer_index][odometer_value];
+          },
+          ""
+        );
+    }/* formCombination() */
+    
+    const odometer_increment = ( odometer, array_of_arrays ) => {
+    
+        // Basically, work you way from the rightmost digit of the "odometer"...
+        // if you're able to increment without cycling that digit back to zero,
+        // you're all done, otherwise, cycle that digit to zero and go one digit to the
+        // left, and begin again until you're able to increment a digit
+        // without cycling it...simple, huh...?
+    
+        for( let i_odometer_digit = odometer.length-1; i_odometer_digit >=0; i_odometer_digit-- ){ 
+            let maxee = array_of_arrays[i_odometer_digit].length - 1;         
+            if( odometer[i_odometer_digit] + 1 <= maxee ){
+                // increment, and you're done...
+                odometer[i_odometer_digit]++;
+                return true;
+            }
+            else{
+                if( i_odometer_digit - 1 < 0 ){
+                    // No more digits left to increment, end of the line...
+                    return false;
+                }
+                else{
+                    // Can't increment this digit, cycle it to zero and continue
+                    // the loop to go over to the next digit...
+                    odometer[i_odometer_digit]=0;
+                    continue;
+                }
+            }
+        }/* for( let odometer_digit = odometer.length-1; odometer_digit >=0; odometer_digit-- ) */
+    
+    }/* odometer_increment() */
+
+    const shuffleArray = array => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    NFTDrop
+    .findById(id)
+    .then(async drop => {
+        const { layers } = drop;
+        const sortedLayerItems = [];
+
+        // sort layers by order
+        layers.sort((layer1, layer2) => {
+            const attribute1 = Object.keys(layer1)[0];
+            const attribute2 = Object.keys(layer2)[0];
+            const rank1 = layer1[attribute1];
+            const rank2 = layer2[attribute2];
+
+            return rank1 - rank2;
+        })
+        
+        const traits = fs.readdirSync(dropPath);
+
+        layers.forEach(layer => {
+            const layerName = Object.keys(layer)[0];
+            const traits = fs.readdirSync(`${dropPath}${layerName}`);
+            traits.forEach((trait, index) => {
+                traits[index] = index + 1;
+            });
+            sortedLayerItems.push(traits);
+        })
+
+        const permutations = combineArrays(sortedLayerItems);
+        shuffleArray(permutations);
+        fs.writeFileSync(`${dropPath}randomized`, JSON.stringify(permutations));
+        console.log(permutations);
+        
+    })
+    .catch(err => console.error(err));
 });
 
 module.exports = router;
