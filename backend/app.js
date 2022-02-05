@@ -42,34 +42,34 @@ app.use(fileUpload({
  * -------------- SESSION SETUP ----------------
  */
 
-const sessionStore = new MongoStore({ 
-    mongooseConnection: connection, 
-    collection: 'sessions' 
-});
-app.enable('trust proxy');
-app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore
-}));
+// const sessionStore = new MongoStore({ 
+//     mongooseConnection: connection, 
+//     collection: 'sessions' 
+// });
+// app.enable('trust proxy');
+// app.use(session({
+//     secret: process.env.SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: sessionStore
+// }));
 
 /**
  * -------------- PASSPORT AUTHENTICATION ----------------
  */
 
 // Need to require the entire Passport config module so app.js knows about it
-require('./config/passport');
+// require('./config/passport');
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-// What is this for?
-app.use((req, res, next) => {
-    // console.log('session', req.session);    
-    // console.log('user', req.user); //no req.user
-    next();
-});
+// // What is this for?
+// app.use((req, res, next) => {
+//     // console.log('session', req.session);    
+//     // console.log('user', req.user); //no req.user
+//     next();
+// });
 
 /**
  * -------------- ROUTES ----------------

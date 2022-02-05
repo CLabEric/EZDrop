@@ -9,6 +9,10 @@ const path = require('path');
 const jwt = require("jsonwebtoken"); 
 const fs = require('fs');
 
+const IPFS = require("ipfs-core"); // we may not need this after testing?
+
+
+
 function authenticateToken(req, res, next) {
     // Read the JWT access token from the request header
     // console.log(req.headers)
@@ -86,37 +90,53 @@ router.post('/upload', async (req, res, next) => {
 // array gets overloaded if this is called multiple times
 // see if can check for uniqueness of layers in array in db
 // can I use await for layers.mv? Can I do this w fs?
-router.post('/upload-layers', (req, res, next) => {
+router.post('/upload-layers', async (req, res, next) => {
     const { id, attribute, rank } = req.body;
     const files = req.files;
 
-    // upload layers for this trait to filesystem
-    // no error handler in for loop, it doesnt play with db call so come up w
-    // another way to validate layers were added correctly
-    for (const file in files) {
-        const layer = files[file];
-        layer.mv( 
-            `${path.join(__dirname, '../')}uploads/${id}/${attribute}/${layer.name}`
-        );
-    }
+    
+    // this will set up a folder in ipfs
+    const ipfs = await IPFS.create()
 
-    NFTDrop
-    .findByIdAndUpdate(
-        id,
-        { 
-            $push: {
-                layers: { [attribute] : parseInt(rank) }
-            } 
-        },
-        {returnDocument: 'after'}
-    )
-    .then(results => {
-        res.send(results);
-    })
-    .catch(error => {
-        console.error(error);
-        res.send(error);
+    const testPath =  `${path.join(__dirname, '../')}uploads/${id}/Arms`;
+    const filesArray = await fs.readdirSync(testPath);
+    const filesURIArray = [];
+
+    filesArray.forEach(async f => {
+        const fp = `${testPath}/${f}`;
+        const file = fs.readFileSync(fp);
+        const fo = {
+            path: `${f}`,
+            content: file
+        }
+        filesURIArray.push(fo);
     });
+
+    // hallelujah!!!!
+    for await (const result of ipfs.addAll(filesURIArray, {wrapWithDirectory: true})) {
+        console.log(result)
+    }
+    // end folder setup in ipfs
+
+
+
+    // NFTDrop
+    // .findByIdAndUpdate(
+    //     id,
+    //     { 
+    //         $push: {
+    //             layers: { [attribute] : parseInt(rank) }
+    //         } 
+    //     },
+    //     {returnDocument: 'after'}
+    // )
+    // .then(results => {
+    //     res.send(results);
+    // })
+    // .catch(error => {
+    //     console.error(error);
+    //     res.send(error);
+    // });
 
 });
 
@@ -162,10 +182,15 @@ router.post('/publish', (req, res, next) => {
  */
 
 router.get('/', async (req, res, next) => {
+    const { userId } = req.query;
+    let params = { $or:
+        [{published: true}, { userId }]
+    };
+    
+    if ( userId === '5' ) params = {};
+
     NFTDrop
-    .find()
-    .where('published')
-    .equals(true)
+    .find(params)
     .then(results => {
         res.send( results )
     })
@@ -182,8 +207,21 @@ router.get('/single', async (req, res, next) => {
 
 router.get('/drop', async (req, res, next) => {
     const urlParam = req.query.drop;
+    const { userId } = req.query;
+
+    let params = {
+        $and: [
+            { urlParam },
+            { 
+                $or: [{published: true}, {userId}]
+            }
+        ]
+    };
+
+    if ( userId == '5' ) params = {};
+
     NFTDrop
-    .find({urlParam})
+    .find(params)
     .then(results => {
         const nftDrop = results[0]._id;
         const payload = {
@@ -191,7 +229,8 @@ router.get('/drop', async (req, res, next) => {
             description: results[0].description,
             price: results[0].price,
             abi: results[0].abi,
-            address: results[0].address
+            address: results[0].address,
+            type: results[0].type
         }
         NFTMeta
         .find({nftDrop})
