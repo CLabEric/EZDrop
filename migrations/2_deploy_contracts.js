@@ -1,7 +1,7 @@
 const EZDrop = artifacts.require("EZDrop");
-const PigsTest = artifacts.require('PigsTest');
+const PiggyTest = artifacts.require('PiggyTest');
 
 module.exports = function (deployer) {
   // deployer.deploy(EZDrop);
-  deployer.deploy(PigsTest);
+  deployer.deploy(PiggyTest);
 };

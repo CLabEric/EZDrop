@@ -71,7 +71,7 @@ router.post('/upload', async (req, res, next) => {
         const itemData = {
             'name'        : req.body.name,
             'description' : req.body.description,
-            'image'       : req.files.file.data,
+            'image'       : req.files.file,
             'traits'      : JSON.parse(req.body.traits)
         };
         const newNFTMeta = new NFTMeta({
@@ -98,7 +98,7 @@ router.post('/upload-layers', async (req, res, next) => {
     // this will set up a folder in ipfs
     const ipfs = await IPFS.create()
 
-    const testPath =  `${path.join(__dirname, '../')}uploads/${id}/Arms`;
+    const testPath = `${path.join(__dirname, '../')}uploads/${id}/Arms`;
     const filesArray = await fs.readdirSync(testPath);
     const filesURIArray = [];
 
@@ -175,6 +175,41 @@ router.post('/publish', (req, res, next) => {
         res.send(error);
     });
 
+});
+
+// should I put 1x1 images on file system or keep them in db
+router.post('/publish-meta-onebyone', async (req, res, next) => {
+    const { id } = req.body;
+    // const ipfs = await IPFS.create();
+
+    // console.log(path);
+    NFTMeta
+    .find({nftDrop: id})
+    .then(async res => {
+        const metaPath = `${path.join(__dirname, '../')}metadata/${id}`;
+
+        if (!fs.existsSync(metaPath)) {
+            fs.mkdirSync(metaPath, {
+                recursive: trueipfsipfs
+            });
+        }
+
+        res.forEach(async item => {
+            // const image = Buffer.from(item.itemData.image);
+            // const imageUri = await ipfs.add(image);
+            const imgPath = `ipfs://QmT88DpLEgqRzU5Y2ESMrkW84raBa3YFQHSamWj6Co915r/${item.itemData.image.name}`;
+            const metadataFile = item.itemData.image.name.split('.')[0];
+            const metadata = {
+                name: item.itemData.name,
+                description: item.itemData.description,
+                image: imgPath,
+                traits: item.itemData.traits
+            };
+            console.log( JSON.stringify(metadata) );
+            // fs.writeFileSync(`${metaPath}/${metadataFile}`, JSON.stringify(metadata));
+        });
+    })
+    .catch(err => console.error(err));
 });
 
  /**
@@ -322,6 +357,7 @@ router.get('/random-image', async (req, res, next) => {
     .catch(err => console.error(err));
 });
 
+// for generative drops
 router.get('/randomize-traits', (req, res, next) => {
     const id = req.query.id; // id of drop
     const dropPath = `${path.join(__dirname, '../')}uploads/${id}/`;

@@ -13,7 +13,7 @@ const connection = mongoose.createConnection(conn, {
     useUnifiedTopology: true
 });
 const ObjectId = mongoose.Schema.ObjectId;
-// const Integer = mongoose.Schema.Integer;
+
 mongoose.set('useFindAndModify', false);
 
 const NFTDropSchema = new mongoose.Schema({
