@@ -269,7 +269,7 @@ router.get('/drop', async (req, res, next) => {
         }
         NFTMeta
         .find({nftDrop})
-        .limit(5)
+        .limit(7)
         .then(results => {
             payload.nfts = results;
             res.send(payload);
