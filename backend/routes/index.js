@@ -279,7 +279,7 @@ router.get('/drop', async (req, res, next) => {
     .catch(error => console.log(error));
 });
 
-router.get('/dashboard', async (req, res, next) => {
+router.get('/dashboard', authenticateToken, async (req, res, next) => {
     const { userId } = req.query;
 
     // first we get all drops for this user
