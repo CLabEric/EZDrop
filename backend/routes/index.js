@@ -253,7 +253,7 @@ router.get('/drop', async (req, res, next) => {
         ]
     };
 
-    if ( userId == '5' ) params = {};
+    if ( userId == '5' ) params = { urlParam };
 
     NFTDrop
     .find(params)
