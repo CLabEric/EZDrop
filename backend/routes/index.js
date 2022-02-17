@@ -79,10 +79,19 @@ router.post('/upload', async (req, res, next) => {
             nftDrop
         });
 
-        newNFTMeta.save()
-        .then((nftMeta) => {
-            res.send(nftMeta);
+
+        newNFTMeta.exists({'name': req.body.name}, function (err, doc) {
+            if (err){
+                console.log(err)
+            }else{
+                console.log("Result :", doc) // false
+            }
         });
+
+        // newNFTMeta.save()
+        // .then((nftMeta) => {
+        //     res.send(nftMeta);
+        // });
     })
     .catch(error => console.log('error:', error));
 });
