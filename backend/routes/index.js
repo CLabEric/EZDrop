@@ -66,7 +66,7 @@ router.post('/upload', async (req, res, next) => {
 
     NFTDrop
     .findById(nftDrop)
-    .then(drop => {
+    .then(async drop => {
         const files = req.files;
         const itemData = {
             'name'        : req.body.name,
@@ -79,19 +79,19 @@ router.post('/upload', async (req, res, next) => {
             nftDrop
         });
 
-
-        newNFTMeta.exists({'name': req.body.name}, function (err, doc) {
-            if (err){
-                console.log(err)
-            }else{
-                console.log("Result :", doc) // false
-            }
+        const duplicate = await NFTMeta.find({ 
+            'itemData.name' : req.body.name,
+            nftDrop
         });
-
-        // newNFTMeta.save()
-        // .then((nftMeta) => {
-        //     res.send(nftMeta);
-        // });
+        
+        if (duplicate.length === 0) {
+            newNFTMeta.save()
+            .then(() => {
+                res.send('Item added sucessfully! Please refresh to preview image.');
+            });
+        } else {
+            res.send('An item with that name already exists.');
+        }
     })
     .catch(error => console.log('error:', error));
 });
