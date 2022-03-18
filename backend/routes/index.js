@@ -83,7 +83,7 @@ router.post('/upload', async (req, res, next) => {
             'itemData.name' : req.body.name,
             nftDrop
         });
-        
+
         if (duplicate.length === 0) {
             newNFTMeta.save()
             .then(() => {
@@ -186,37 +186,88 @@ router.post('/publish', (req, res, next) => {
 
 });
 
-// should I put 1x1 images on file system or keep them in db
-router.post('/publish-meta-onebyone', async (req, res, next) => {
+router.post('/updateCollectionDescription', (req, res, next) => {
+    console.log(req.body);
     const { id } = req.body;
-    // const ipfs = await IPFS.create();
+    const descriptionArray = req.body.description;
 
-    // console.log(path);
+    NFTDrop
+    .findByIdAndUpdate(id, {descriptionArray}, {returnDocument: 'after'})
+    .then(results => {
+        res.send(results);
+    })
+    .catch(error => {
+        res.send(error);
+    });
+});
+
+/** 
+ * Takes uploaded images in 1x1 drop and creates a folder to
+ * upload to IPFS
+*/
+router.post('/prep-images-ipfs-onebyone', (req, res, next) => {
+    // todo - validate file extensions are uniform
+    const { id } = req.body;
+
+    // create folder for this drops meta if none yet
+    const folderPath = `${path.join(__dirname, '../')}onexoneimages/${id}`;
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, {
+            recursive: true
+        });
+    }
+
     NFTMeta
     .find({nftDrop: id})
-    .then(async res => {
-        const metaPath = `${path.join(__dirname, '../')}metadata/${id}`;
+    .sort({"created_at": 1})
+    .then(nfts => {
+        // 3. these will have to come back in same order 
+        // when creating metadata
+        nfts.forEach((nft, index) => {
+            fs.writeFileSync(`${folderPath}/${index + 1}.jpeg`, nft.itemData.image.data.buffer);
+        })
 
-        if (!fs.existsSync(metaPath)) {
-            fs.mkdirSync(metaPath, {
-                recursive: trueipfsipfs
+        res.send('Image folder successfully created. Please upload to IPFS');
+    })
+    .catch(err => console.error(err));
+});
+
+// should I put 1x1 images on file system or keep them in db?
+router.post('/publish-meta-onebyone', async (req, res, next) => {
+    const { id, ipfsFolder } = req.body;
+
+    NFTMeta
+    .find({nftDrop: id})
+    .sort({"created_at": 1})
+    .then(async nfts => {
+        const dir = `${path.join(__dirname, '../')}metadata/${id}`;
+
+        // delete directory if it exists then make new one regardless
+        if (fs.existsSync(dir)) {
+            fs.rm(dir, { recursive: true }, (err) => {
+                if (err) throw err;
             });
         }
+        fs.mkdirSync(dir, {
+            recursive: true
+        });
 
-        res.forEach(async item => {
-            // const image = Buffer.from(item.itemData.image);
-            // const imageUri = await ipfs.add(image);
-            const imgPath = `ipfs://QmT88DpLEgqRzU5Y2ESMrkW84raBa3YFQHSamWj6Co915r/${item.itemData.image.name}`;
-            const metadataFile = item.itemData.image.name.split('.')[0];
+        // for each item in this drop prepare entries for metadata and image folders
+        // to upload for ipfs
+        nfts.forEach(async (item, index) => {
+            const imgPath = `ipfs://${ipfsFolder}/${index + 1}`;
             const metadata = {
                 name: item.itemData.name,
                 description: item.itemData.description,
                 image: imgPath,
                 traits: item.itemData.traits
             };
-            console.log( JSON.stringify(metadata) );
-            // fs.writeFileSync(`${metaPath}/${metadataFile}`, JSON.stringify(metadata));
+            // console.log( JSON.stringify(metadata) );
+            fs.writeFileSync(`${dir}/${index + 1}`, JSON.stringify(metadata));
         });
+
+        res.send('Metadata folder successfully created. Please upload to IPFS');
+
     })
     .catch(err => console.error(err));
 });
@@ -235,6 +286,7 @@ router.get('/', async (req, res, next) => {
 
     NFTDrop
     .find(params)
+    .select('blurb title urlParam')
     .then(results => {
         res.send( results )
     })
@@ -263,27 +315,33 @@ router.get('/drop', async (req, res, next) => {
     };
 
     if ( userId == '5' ) params = { urlParam };
-
+    
+    // title, blurb, description, address, price, abi
+    
     NFTDrop
     .find(params)
     .then(results => {
         const nftDrop = results[0]._id;
         const payload = {
             title: results[0].title,
-            description: results[0].description,
+            urlParam: results[0].urlParam,
+            descriptionArray: results[0].descriptionArray,
             price: results[0].price,
             abi: results[0].abi,
             address: results[0].address,
-            type: results[0].type
+            type: results[0].type,
+            blurb: results[0].blurb
         }
-        NFTMeta
-        .find({nftDrop})
-        .limit(7)
-        .then(results => {
-            payload.nfts = results;
-            res.send(payload);
-        })
-        .catch(error => console.log(error));
+        res.send(payload);
+        // NFTMeta
+        // .find({nftDrop})
+        // .limit(7)
+        // .then(results => {
+        //     payload.nfts = results;
+        //     // fs.writeFileSync(`${__dirname}/results.json`, JSON.stringify(payload));
+        //     res.send(payload);
+        // })
+        // .catch(error => console.log(error));
     })
     .catch(error => console.log(error));
 });
