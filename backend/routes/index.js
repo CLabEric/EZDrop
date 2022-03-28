@@ -308,15 +308,16 @@ router.get('/drop', async (req, res, next) => {
     .then(results => {
         const nftDrop = results[0]._id;
         const payload = {
-            title: results[0].title,
-            urlParam: results[0].urlParam,
-            descriptionArray: results[0].descriptionArray,
-            price: results[0].price,
             abi: results[0].abi,
             address: results[0].address,
+            blurb: results[0].blurb,
+            descriptionArray: results[0].descriptionArray,
+            isLive: results[0].isLive,
+            price: results[0].price,
             testAddress: results[0].testAddress,
+            title: results[0].title,
             type: results[0].type,
-            blurb: results[0].blurb
+            urlParam: results[0].urlParam
         }
         res.send(payload);
     })
