@@ -186,21 +186,6 @@ router.post('/publish', (req, res, next) => {
 
 });
 
-router.post('/updateCollectionDescription', (req, res, next) => {
-    console.log(req.body);
-    const { id } = req.body;
-    const descriptionArray = req.body.description;
-
-    NFTDrop
-    .findByIdAndUpdate(id, {descriptionArray}, {returnDocument: 'after'})
-    .then(results => {
-        res.send(results);
-    })
-    .catch(error => {
-        res.send(error);
-    });
-});
-
 /** 
  * Takes uploaded images in 1x1 drop and creates a folder to
  * upload to IPFS
@@ -329,19 +314,11 @@ router.get('/drop', async (req, res, next) => {
             price: results[0].price,
             abi: results[0].abi,
             address: results[0].address,
+            testAddress: results[0].testAddress,
             type: results[0].type,
             blurb: results[0].blurb
         }
         res.send(payload);
-        // NFTMeta
-        // .find({nftDrop})
-        // .limit(7)
-        // .then(results => {
-        //     payload.nfts = results;
-        //     // fs.writeFileSync(`${__dirname}/results.json`, JSON.stringify(payload));
-        //     res.send(payload);
-        // })
-        // .catch(error => console.log(error));
     })
     .catch(error => console.log(error));
 });
@@ -548,6 +525,39 @@ router.get('/randomize-traits', (req, res, next) => {
         
     })
     .catch(err => console.error(err));
+});
+
+
+/**
+ *  for redesign, should we authenticate every request?
+ */
+router.get('/getDrops', authenticateToken, (req, res, next) => {
+    const { userId } = req.query;
+    const params = userId == 5 ? {} : { userId };
+    
+    NFTDrop
+    .find()
+    .then(results => {
+        res.send(results)
+    })
+    .catch();
+
+});
+
+router.post('/updateCollection', (req, res, next) => {
+    const { abi, address, blurb, descriptionArray, id, isLive, price, published, testAddress, userId} = req.body.params;
+    const data = { abi, address, blurb, descriptionArray, isLive, price, published, testAddress };
+
+    NFTDrop
+    .findByIdAndUpdate(id, data, {returnDocument: 'after'})
+    .then(results => {
+        res.send(results);
+    })
+    .catch(error => { 
+        console.error(error);
+        res.send(error);
+    });
+
 });
 
 module.exports = router;
