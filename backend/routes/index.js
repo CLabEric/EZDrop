@@ -271,7 +271,7 @@ router.get('/', async (req, res, next) => {
 
     NFTDrop
     .find(params)
-    .select('blurb title urlParam')
+    .select('blurb title urlParam price')
     .then(results => {
         res.send( results )
     })
