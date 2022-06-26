@@ -32,18 +32,18 @@ function authenticateToken(req, res, next) {
  */
 
 // TODO drop must have unique name !!!!!!!
-router.post('/create-drop', (req, res, next) => {
-    const { title, userId, type } = req.body;
-    const urlParam = title.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
-    const newNFTDrop = new NFTDrop(
-        { userId, title, urlParam, type, published: false }
-    );
+// router.post('/create-drop', (req, res, next) => {
+//     const { title, userId, type } = req.body;
+//     const urlParam = title.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
+//     const newNFTDrop = new NFTDrop(
+//         { userId, title, urlParam, type, published: false }
+//     );
 
-    newNFTDrop.save()
-    .then(nftDrop => {
-        res.send(nftDrop);
-    });
-});
+//     newNFTDrop.save()
+//     .then(nftDrop => {
+//         res.send(nftDrop);
+//     });
+// });
 
 router.post('/configure-drop', (req, res, next) => {
     const { id, price, blurb, description, traits } = req.body;
@@ -267,12 +267,13 @@ router.get('/', async (req, res, next) => {
         [{published: true}, { userId }]
     };
     
-    if ( userId === '5' ) params = {};
+    if ( userId === '5' || !process.env.ORIGIN) params = {};
 
     NFTDrop
     .find(params)
     .select('blurb title urlParam price')
     .then(results => {
+        console.log(results);
         res.send( results )
     })
     .catch(error => console.log(error));
@@ -307,18 +308,7 @@ router.get('/drop', async (req, res, next) => {
     .find(params)
     .then(results => {
         const nftDrop = results[0]._id;
-        const payload = {
-            abi: results[0].abi,
-            address: results[0].address,
-            blurb: results[0].blurb,
-            descriptionArray: results[0].descriptionArray,
-            isLive: results[0].isLive,
-            price: results[0].price,
-            testAddress: results[0].testAddress,
-            title: results[0].title,
-            type: results[0].type,
-            urlParam: results[0].urlParam
-        }
+        const payload = results[0];
         res.send(payload);
     })
     .catch(error => console.log(error));
@@ -532,12 +522,40 @@ router.get('/randomize-traits', (req, res, next) => {
 /**
  *  for redesign, should we authenticate every request?
  */
+
+router.post('/create-drop', (req, res, next) => {
+    
+    const { 
+        userId, abi, blurb, price, title, type, address, testAddress, 
+        polygonAddress, polygonTestAddress, optimismAddress, optimismTestAddress, 
+        arbitrumAddress, arbitrumTestAddress, binanceSCAddress, binanceSCTestAddress, 
+        avalancheAddress, avalancheTestAddress, fantomAddress, fantomTestAddress 
+    } = req.body.params;
+
+    const urlParam = title.replace(/'/g, '').replace(/\s/g , "-").toLowerCase();
+
+    const newNFTDrop = new NFTDrop(
+        {
+            userId, abi, blurb, price, title, type, address, testAddress, 
+            polygonAddress, polygonTestAddress, optimismAddress, optimismTestAddress, 
+            arbitrumAddress, arbitrumTestAddress, binanceSCAddress, binanceSCTestAddress, 
+            avalancheAddress, avalancheTestAddress, fantomAddress, fantomTestAddress,
+            urlParam, published: false, isLive: false
+        }
+    );
+
+    newNFTDrop.save()
+    .then(nftDrop => {
+        res.send(nftDrop);
+    });
+});
+
 router.get('/getDrops', authenticateToken, (req, res, next) => {
     const { userId } = req.query;
     const params = userId == 5 ? {} : { userId };
     
     NFTDrop
-    .find()
+    .find(params)
     .then(results => {
         res.send(results)
     })
@@ -546,8 +564,57 @@ router.get('/getDrops', authenticateToken, (req, res, next) => {
 });
 
 router.post('/updateCollection', (req, res, next) => {
-    const { abi, address, blurb, descriptionArray, id, isLive, price, published, testAddress, userId} = req.body.params;
-    const data = { abi, address, blurb, descriptionArray, isLive, price, published, testAddress };
+    const { 
+        blurb, descriptionArray, id, isLive, price, published, 
+
+        address, abi, 
+        testAddress, testAbi,
+
+        polygonAddress, polygonAbi,
+        polygonTestAddress, polygonTestAbi,
+        
+        optimismAddress, optimismAbi,
+        optimismTestAddress, optimismTestAbi,
+        
+        arbitrumAddress, arbitrumAbi,
+        arbitrumTestAddress, arbitrumTestAbi,
+
+        binanceSCAddress, binanceSCAbi,
+        binanceSCTestAddress, binanceSCTestAbi,
+
+        avalancheAddress, avalancheAbi,
+        avalancheTestAddress, avalancheTestAbi,
+
+        fantomAddress, fantomAbi,
+        fantomTestAddress, fantomTestAbi
+
+
+    } = req.body.params;
+    
+    const data = {
+        blurb, descriptionArray, isLive, price, published, 
+        
+        address, abi, 
+        testAddress, testAbi,
+
+        polygonAddress, polygonAbi,
+        polygonTestAddress, polygonTestAbi,
+        
+        optimismAddress, optimismAbi,
+        optimismTestAddress, optimismTestAbi,
+        
+        arbitrumAddress, arbitrumAbi,
+        arbitrumTestAddress, arbitrumTestAbi,
+
+        binanceSCAddress, binanceSCAbi,
+        binanceSCTestAddress, binanceSCTestAbi,
+
+        avalancheAddress, avalancheAbi,
+        avalancheTestAddress, avalancheTestAbi,
+
+        fantomAddress, fantomAbi,
+        fantomTestAddress, fantomTestAbi
+    };
 
     NFTDrop
     .findByIdAndUpdate(id, data, {returnDocument: 'after'})

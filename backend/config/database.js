@@ -29,9 +29,42 @@ const NFTDropSchema = new mongoose.Schema({
     traits: Array,
     isLive: Boolean,
     published: Boolean,
+
     abi: Object,
     address: String,
+    testAbi: Object,
     testAddress: String,
+
+    polygonAbi: Object,
+    polygonAddress: String,
+    polygonTestAbi: Object,
+    polygonTestAddress: String,
+
+    optimismAbi: Object,
+    optimismAddress: String,
+    optimismTestAbi: Object,
+    optimismTestAddress: String,
+
+    arbitrumAbi: Object,
+    arbitrumAddress: String,
+    arbitrumTestAbi: Object,
+    arbitrumTestAddress: String,
+
+    binanceSCAbi: Object,
+    binanceSCAddress: String,
+    binanceSCTestAbi: Object,
+    binanceSCTestAddress: String,
+
+    avalancheAbi: Object,
+    avalancheAddress: String,
+    avalancheTestAbi: Object,
+    avalancheTestAddress: String,
+
+    fantomAbi: Object,
+    fantomAddress: String,
+    fantomTestAbi: Object,
+    fantomTestAddress: String,
+
     layers: Object
 });
 
