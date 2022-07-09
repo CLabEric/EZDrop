@@ -567,26 +567,26 @@ router.post('/updateCollection', (req, res, next) => {
     const { 
         blurb, descriptionArray, id, isLive, price, published, 
 
-        address, abi, 
-        testAddress, testAbi,
+        address, abi, openSeaLink,
+        testAddress, testAbi, testOpenSeaLink,
 
-        polygonAddress, polygonAbi,
-        polygonTestAddress, polygonTestAbi,
+        polygonAddress, polygonAbi, polygonOpenSeaLink,
+        polygonTestAddress, polygonTestAbi, polygonTestOpenSeaLink,
         
-        optimismAddress, optimismAbi,
-        optimismTestAddress, optimismTestAbi,
+        optimismAddress, optimismAbi, optimismOpenSeaLink,
+        optimismTestAddress, optimismTestAbi, optimismTestOpenSeaLink,
         
-        arbitrumAddress, arbitrumAbi,
-        arbitrumTestAddress, arbitrumTestAbi,
+        arbitrumAddress, arbitrumAbi, arbitrumOpenSeaLink,
+        arbitrumTestAddress, arbitrumTestAbi, arbitrumTestOpenSeaLink,
 
-        binanceSCAddress, binanceSCAbi,
-        binanceSCTestAddress, binanceSCTestAbi,
+        binanceSCAddress, binanceSCAbi, binanceSCOpenSeaLink,
+        binanceSCTestAddress, binanceSCTestAbi, binanceSCTestOpenSeaLink,
 
-        avalancheAddress, avalancheAbi,
-        avalancheTestAddress, avalancheTestAbi,
+        avalancheAddress, avalancheAbi, avalancheOpenSeaLink,
+        avalancheTestAddress, avalancheTestAbi, avalancheTestOpenSeaLink,
 
-        fantomAddress, fantomAbi,
-        fantomTestAddress, fantomTestAbi
+        fantomAddress, fantomAbi, fantomOpenSeaLink,
+        fantomTestAddress, fantomTestAbi, fantomTestOpenSeaLink
 
 
     } = req.body.params;
@@ -594,26 +594,26 @@ router.post('/updateCollection', (req, res, next) => {
     const data = {
         blurb, descriptionArray, isLive, price, published, 
         
-        address, abi, 
-        testAddress, testAbi,
+        address, abi, openSeaLink,
+        testAddress, testAbi, testOpenSeaLink,
 
-        polygonAddress, polygonAbi,
-        polygonTestAddress, polygonTestAbi,
+        polygonAddress, polygonAbi, polygonOpenSeaLink,
+        polygonTestAddress, polygonTestAbi, polygonTestOpenSeaLink,
         
-        optimismAddress, optimismAbi,
-        optimismTestAddress, optimismTestAbi,
+        optimismAddress, optimismAbi, optimismOpenSeaLink,
+        optimismTestAddress, optimismTestAbi, optimismTestOpenSeaLink,
         
-        arbitrumAddress, arbitrumAbi,
-        arbitrumTestAddress, arbitrumTestAbi,
+        arbitrumAddress, arbitrumAbi, arbitrumOpenSeaLink,
+        arbitrumTestAddress, arbitrumTestAbi, arbitrumTestOpenSeaLink,
 
-        binanceSCAddress, binanceSCAbi,
-        binanceSCTestAddress, binanceSCTestAbi,
+        binanceSCAddress, binanceSCAbi, binanceSCOpenSeaLink,
+        binanceSCTestAddress, binanceSCTestAbi, binanceSCTestOpenSeaLink,
 
-        avalancheAddress, avalancheAbi,
-        avalancheTestAddress, avalancheTestAbi,
+        avalancheAddress, avalancheAbi, avalancheOpenSeaLink,
+        avalancheTestAddress, avalancheTestAbi, avalancheTestOpenSeaLink,
 
-        fantomAddress, fantomAbi,
-        fantomTestAddress, fantomTestAbi
+        fantomAddress, fantomAbi, fantomOpenSeaLink,
+        fantomTestAddress, fantomTestAbi, fantomTestOpenSeaLink
     };
 
     NFTDrop
